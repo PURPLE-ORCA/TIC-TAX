@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "skills": {
+    "compound-ui": {
+      "source": "PURPLE-ORCA/skills",
+      "sourceType": "github",
+      "computedHash": "7ff4e9b2aa325e7359802c8b709ef70c0a4ce0ea8da5a23f9cccb47d647fb11a"
+    },
+    "convex-authorization": {
+      "source": "PURPLE-ORCA/skills",
+      "sourceType": "github",
+      "computedHash": "39a764e345040203bd63962f98e88aabe730618c48ffddc25284c4cfc4ca54d5"
+    },
+    "expo-bottom-sheets": {
+      "source": "PURPLE-ORCA/skills",
+      "sourceType": "github",
+      "computedHash": "fcdd4c36bfe66d845f128dceb88079f69d1ca34eacdeef33137f4e8af544043d"
+    },
+    "expo-heroui-architecture": {
+      "source": "PURPLE-ORCA/skills",
+      "sourceType": "github",
+      "computedHash": "fbe926f06a4f3e283313c489d099078d06ba707803d4b866330295217c4e24d8"
+    },
+    "universal-docs": {
+      "source": "PURPLE-ORCA/skills",
+      "sourceType": "github",
+      "computedHash": "d3e7e01111751a8babae3c57ad72d9b83035b809cf1e7227e0737e7977bed1c4"
+    }
+  }
+}
