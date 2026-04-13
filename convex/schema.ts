@@ -5,7 +5,7 @@ export default defineSchema({
   transactions: defineTable({
     amount: v.number(), 
     type: v.union(v.literal("IN"), v.literal("OUT")),
-    category: v.string(), // e.g., "Freelance", "Taxi", "Junk"
+    category: v.string(),
     taxAmount: v.number(),
     timestamp: v.number(),
   }).index("by_type", ["type"]),
