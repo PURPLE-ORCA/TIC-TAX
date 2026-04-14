@@ -11,7 +11,7 @@ import {
 } from 'heroui-native';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { ArrowDown, ArrowUp, Check } from 'lucide-react-native';
+import { Check } from 'lucide-react-native';
 import { Text } from '@/src/components/ui/text';
 
 interface TransactionSheetProps {
@@ -72,7 +72,6 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
                 )}
                 onPress={() => setType('IN')}
               >
-                <ArrowUp color={type === 'IN' ? 'white' : 'rgba(255,255,255,0.4)'} size={20} />
                 <Button.Label className={cn("font-bold ml-2", type === 'IN' ? "text-white" : "text-foreground/40")}>
                   Income
                 </Button.Label>
@@ -85,7 +84,6 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
                 )}
                 onPress={() => setType('OUT')}
               >
-                <ArrowDown color={type === 'OUT' ? 'white' : 'rgba(255,255,255,0.4)'} size={20} />
                 <Button.Label className={cn("font-bold ml-2", type === 'OUT' ? "text-white" : "text-foreground/40")}>
                   Expense
                 </Button.Label>
@@ -116,7 +114,7 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
                     <Chip 
                       key={cat}
                       onPress={() => setCategory(cat)}
-                      variant={category === cat ? 'danger' : 'accent'}
+                      variant={category === cat ? "danger" : "accent"}
                       className={cn(
                         "px-5 py-2.5 rounded-xl border border-white/5",
                         category === cat ? "bg-primary border-primary" : "bg-white/5"

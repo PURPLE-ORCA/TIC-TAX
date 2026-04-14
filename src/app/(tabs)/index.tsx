@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { View, FlatList } from 'react-native';
 import { SafeScreen } from '@/src/components/layout/SafeScreen';
 import { Text } from '@/src/components/ui/text';
+import { CustomButton } from '@/src/components/ui/custom-button';
 import { useFinance } from '@/src/hooks/useFinance';
-import { TransactionSheet } from '@/src/components/finance/TransactionSheet';
-import { Button, Card } from 'heroui-native';
+import { TransactionSheet } from '../../components/finance/TransactionSheet';
+import { Card } from 'heroui-native';
 import { formatCurrency } from '@/src/lib/format-currency';
 
 export default function PulseTab() {
@@ -47,19 +48,16 @@ export default function PulseTab() {
 
       {/* Trigger */}
       <View className="mt-8 mb-10">
-        <Button
-          className="rounded-xl bg-primary/15 h-14"
+        <CustomButton
+          variant="secondary"
+          label="New Transaction"
           onPress={() => setIsSheetOpen(true)}
-        >
-          <Button.Label className="text-primary font-bold text-lg">
-            New Transaction
-          </Button.Label>
-        </Button>
+        />
       </View>
 
       {/* Recent Transactions List */}
       <View className="flex-1">
-        <Text variant="xsBold" className="text-foreground/30 uppercase tracking-[2px] mb-4">
+        <Text className="mb-4">
           Recent Activity
         </Text>
         
@@ -69,7 +67,7 @@ export default function PulseTab() {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             !isLoading ? (
-              <Text variant="small" className="text-foreground/20 italic mt-2">
+              <Text >
                 No transactions yet.
               </Text>
             ) : null
