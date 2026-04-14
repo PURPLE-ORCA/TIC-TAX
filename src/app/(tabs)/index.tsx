@@ -15,6 +15,7 @@ export default function PulseTab() {
   const { safeToSpend, taxHostage, recentTransactions, isLoading } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const deleteTransaction = useMutation(api.transactions.deleteTransaction);
+  const markTaxesPaid = useMutation(api.transactions.markTaxesPaid);
 
   const handleDeleteTransaction = (id: Id<'transactions'>) => {
     Alert.alert('Delete Transaction?', undefined, [
@@ -34,6 +35,29 @@ export default function PulseTab() {
         },
       },
     ]);
+  };
+
+  const handleMarkTaxesPaid = () => {
+    Alert.alert(
+      'Pay the Piper?',
+      'Mark all current taxes as paid? This will reset the hostage counter to 0 MAD.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            try {
+              await markTaxesPaid({});
+            } catch (error) {
+              console.error('Failed to mark taxes paid:', error);
+            }
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -56,17 +80,19 @@ export default function PulseTab() {
             </Text>
           </Card>
 
-          <Card variant="transparent" className="p-6 rounded-xl border border-red-500/20 bg-red-500/5">
-            <Text variant="smallBold" className="text-red-500/60 mb-1">
-              Tax Hostage
-            </Text>
-            <Text 
-              variant="subtitle" 
-              className="text-red-500"
-            >
-              {isLoading ? '...' : formatCurrency(taxHostage)}
-            </Text>
-          </Card>
+          <TouchableOpacity onLongPress={handleMarkTaxesPaid} delayLongPress={300}>
+            <Card variant="transparent" className="p-6 rounded-xl border border-red-500/20 bg-red-500/5">
+              <Text variant="smallBold" className="text-red-500/60 mb-1">
+                Tax Hostage
+              </Text>
+              <Text 
+                variant="subtitle" 
+                className="text-red-500"
+              >
+                {isLoading ? '...' : formatCurrency(taxHostage)}
+              </Text>
+            </Card>
+          </TouchableOpacity>
         </View>
       </View>
 

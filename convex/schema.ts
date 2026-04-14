@@ -7,6 +7,7 @@ export default defineSchema({
     type: v.union(v.literal("IN"), v.literal("OUT")),
     category: v.string(),
     taxAmount: v.number(),
+    taxCleared: v.optional(v.boolean()),
     timestamp: v.number(),
     note: v.optional(v.string()),
   }).index("by_type", ["type"])

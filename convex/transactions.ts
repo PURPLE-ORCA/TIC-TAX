@@ -30,12 +30,16 @@ export const getDashboardStats = query({
 
     let totalIn = 0;
     let totalOut = 0;
+    let totalTax = 0;
     let taxHostage = 0;
 
     for (const tx of allTxs) {
       if (tx.type === "IN") {
         totalIn += tx.amount;
-        taxHostage += tx.taxAmount;
+        totalTax += tx.taxAmount;
+        if (!tx.taxCleared) {
+          taxHostage += tx.taxAmount;
+        }
       } else {
         totalOut += tx.amount;
       }
@@ -48,7 +52,7 @@ export const getDashboardStats = query({
       .take(10);
 
     // Safe to spend is Total Income - Total Expenses - The 1% we owe the government
-    const safeToSpend = totalIn - totalOut - taxHostage;
+    const safeToSpend = totalIn - totalOut - totalTax;
 
     return {
       safeToSpend,
@@ -65,5 +69,21 @@ export const deleteTransaction = mutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
+  },
+});
+
+export const markTaxesPaid = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const incomeTransactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("type"), "IN"))
+      .collect();
+
+    for (const tx of incomeTransactions) {
+      if (!tx.taxCleared) {
+        await ctx.db.patch(tx._id, { taxCleared: true });
+      }
+    }
   },
 });
