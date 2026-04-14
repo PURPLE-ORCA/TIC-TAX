@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { SafeScreen } from '@/src/components/layout/SafeScreen';
 import { Text } from '@/src/components/ui/text';
 import { useFinance } from '@/src/hooks/useFinance';
-import { TransactionSheet } from '@/src/components/screens/finance/TransactionSheet';
+import { TransactionSheet } from '@/src/components/finance/TransactionSheet';
 import { Plus } from 'lucide-react-native';
 import { Button, Card } from 'heroui-native';
 import { formatCurrency } from '@/src/lib/format-currency';
@@ -16,30 +16,29 @@ export default function PulseTab() {
     <SafeScreen safeArea="both" contentClassName="justify-between">
       {/* Header */}
       <View className="px-6 pt-12">
-        <Text variant="smallBold" className="text-primary uppercase tracking-[4px] mb-4">
+        <Text variant="title" className="mb-4">
           Financial Pulse
         </Text>
         
         <View className="gap-4">
-          <Card variant="secondary" className="p-6 rounded-3xl border border-white/5">
-            <Text variant="smallBold" className="text-foreground/40 uppercase mb-1">
+          <Card variant="transparent" className="p-6 border rounded-xl">
+            <Text variant="smallBold" className="text-foreground/40 mb-1">
               Safe to Spend
             </Text>
             <Text 
-              variant="title" 
-              className="text-primary text-5xl font-black"
+              variant="subtitle" 
             >
               {isLoading ? '...' : formatCurrency(safeToSpend)}
             </Text>
           </Card>
 
-          <Card variant="transparent" className="p-6 rounded-3xl border border-red-500/20 bg-red-500/5">
-            <Text variant="smallBold" className="text-red-500/60 uppercase mb-1">
+          <Card variant="transparent" className="p-6 rounded-xl border border-red-500/20 bg-red-500/5">
+            <Text variant="smallBold" className="text-red-500/60 mb-1">
               Tax Hostage
             </Text>
             <Text 
               variant="subtitle" 
-              className="text-red-500 font-bold"
+              className="text-red-500"
             >
               {isLoading ? '...' : formatCurrency(taxHostage)}
             </Text>
@@ -50,7 +49,7 @@ export default function PulseTab() {
       {/* FAB */}
       <View className="px-6 pb-6">
         <Button
-          variant="primary"
+          variant="tertiary"
           className="h-16 rounded-2xl shadow-lg shadow-primary/20"
           onPress={() => setIsSheetOpen(true)}
         >

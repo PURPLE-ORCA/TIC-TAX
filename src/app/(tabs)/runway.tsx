@@ -20,7 +20,7 @@ export default function RunwayScreen() {
           </Text>
         </View>
 
-        <Card variant="secondary" className="p-8 rounded-[32px] border border-white/5 items-center">
+        <Card variant="secondary" className="p-8 rounded-4xl border border-white/5 items-center">
           <Text variant="large" className="text-foreground/20 font-bold uppercase tracking-widest mb-2">
             Status
           </Text>

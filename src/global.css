@@ -4,14 +4,23 @@
 
 @source '../node_modules/heroui-native/lib';
 
+@theme {
+  --color-primary: #C200FB;
+}
+
 @layer theme {
   :root {
+    --color-primary: #C200FB;
+    --color-background: #FFFFFF;
+    --color-foreground: #000000;
+    --color-secondary: #C200FB;
+    --color-accent: #C200FB;
+    --color-muted: #F5F5F5;
+    --color-border: #E5E5E5;
+
     @variant dark {
       --color-background: #00120B;
       --color-foreground: #FFFFFF;
-      --color-primary: #C200FB;
-      --color-secondary: #C200FB;
-      --color-accent: #C200FB;
       --color-muted: #1A1A1A;
       --color-border: #333333;
     }
