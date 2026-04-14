@@ -2,8 +2,8 @@ import { useThemeColor } from 'heroui-native';
 import { ReactNode } from 'react';
 import { View } from 'react-native';
 import { Easing } from 'react-native-reanimated';
-import Shimmer from '../animations/animation/shimmer';
-import { Text } from '../ui/text';
+import Shimmer from "@/src/components/animations/animation/shimmer";
+import { Text } from "@/src/components/ui/text";
 
 interface TextShimmerProps {
   children: ReactNode;

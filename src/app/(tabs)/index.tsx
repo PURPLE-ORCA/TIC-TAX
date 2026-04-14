@@ -7,7 +7,7 @@ import { SafeScreen } from '@/src/components/layout/SafeScreen';
 import { Text } from '@/src/components/ui/text';
 import { CustomButton } from '@/src/components/ui/custom-button';
 import { useFinance } from '@/src/hooks/useFinance';
-import { TransactionSheet } from '../../components/finance/TransactionSheet';
+import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
 import { Card } from 'heroui-native';
 import { formatCurrency } from '@/src/lib/format-currency';
 
