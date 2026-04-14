@@ -102,8 +102,11 @@ export default function PulseTab() {
               onLongPress={() => handleDeleteTransaction(tx._id)}
               delayLongPress={300}
             >
-              <Text variant="small" className="text-foreground/80">
-                {tx.category}
+              <Text 
+                variant={tx.note ? "default" : "small"} 
+                className={tx.note ? "text-foreground font-semibold" : "text-foreground/80"}
+              >
+                {tx.note || tx.category}
               </Text>
               <Text 
                 variant="smallBold" 

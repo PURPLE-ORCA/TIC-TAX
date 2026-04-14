@@ -8,6 +8,7 @@ export default defineSchema({
     category: v.string(),
     taxAmount: v.number(),
     timestamp: v.number(),
+    note: v.optional(v.string()),
   }).index("by_type", ["type"])
     .index("by_timestamp", ["timestamp"]),
 

@@ -6,7 +6,6 @@ import {
   Input, 
   Label, 
   TextField,
-  cn 
 } from 'heroui-native';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -22,7 +21,6 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
   const [name, setName] = useState('');
   const [monthlyCost, setMonthlyCost] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const addSubscription = useMutation(api.subscriptions.addSubscription);
 
   const handleSubmit = async () => {

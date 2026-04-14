@@ -6,6 +6,7 @@ export const logTransaction = mutation({
     amount: v.number(),
     type: v.union(v.literal("IN"), v.literal("OUT")),
     category: v.string(),
+    note: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // The 1% Tax Logic: Only applies to Income.
@@ -17,6 +18,7 @@ export const logTransaction = mutation({
       category: args.category,
       taxAmount: taxAmount,
       timestamp: Date.now(),
+      note: args.note,
     });
   },
 });

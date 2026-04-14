@@ -23,6 +23,7 @@ const CATEGORIES = ['Taxi', 'Food', 'SaaS', 'Junk'];
 
 export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps) {
   const [amount, setAmount] = useState('');
+  const [note, setNote] = useState('');
   const [type, setType] = useState<'IN' | 'OUT'>('OUT');
   const [category, setCategory] = useState('Junk');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,8 +40,10 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
         amount: numAmount,
         type,
         category: type === 'IN' ? 'Income' : category,
+        note: note.trim() || undefined,
       });
       setAmount('');
+      setNote('');
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to log transaction:', error);
@@ -63,7 +66,7 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
             </View>
 
             {/* IN/OUT Toggle */}
-            <View className="flex-row bg-white/5 p-1.5 rounded-2xl">
+            <View className="flex-row p-1.5 rounded-2xl">
               <Button 
                 variant={type === 'IN' ? 'primary' : 'ghost'}
                 className={cn(
@@ -92,14 +95,12 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
 
             {/* Amount Input */}
             <TextField>
-              <Label className="text-foreground/40 font-bold mb-2 uppercase tracking-widest text-xs">Amount</Label>
+              <Label>Amount</Label>
               <Input
                 placeholder="0.00"
                 value={amount}
                 onChangeText={setAmount}
                 keyboardType="decimal-pad"
-                className="bg-white/5 border-none h-20 text-4xl font-black text-primary px-6 rounded-2xl"
-                placeholderColorClassName="text-white/10"
                 selectionColorClassName="accent-primary"
                 autoFocus
               />
@@ -108,13 +109,12 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
             {/* Category Chips (only for OUT) */}
             {type === 'OUT' && (
               <View className="gap-3">
-                <Label className="text-foreground/40 font-bold uppercase tracking-widest text-xs">Category</Label>
+                <Label >Category</Label>
                 <View className="flex-row flex-wrap gap-2">
                   {CATEGORIES.map((cat) => (
                     <Chip 
                       key={cat}
                       onPress={() => setCategory(cat)}
-                      variant={category === cat ? "danger" : "accent"}
                       className={cn(
                         "px-5 py-2.5 rounded-xl border border-white/5",
                         category === cat ? "bg-primary border-primary" : "bg-white/5"
@@ -132,10 +132,20 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
               </View>
             )}
 
+            {/* Note Input */}
+            <TextField>
+              <Label>Note</Label>
+              <Input
+                placeholder="Optional note (Client, reason, etc.)"
+                value={note}
+                onChangeText={setNote}
+                selectionColorClassName="accent-primary"
+              />
+            </TextField>
+
             {/* Submit Button */}
             <Button 
-              variant="primary"
-              className="h-16 rounded-2xl shadow-xl shadow-primary/30 mt-4"
+              variant="secondary"
               onPress={handleSubmit}
               isDisabled={!amount || isSubmitting}
             >
