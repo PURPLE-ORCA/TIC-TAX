@@ -7,31 +7,39 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#000000',
-          borderTopColor: '#1A1A1A',
-          height: 80,
-          paddingBottom: 25,
+          backgroundColor: '#00120B',
+          borderTopColor: 'rgba(255,255,255,0.05)',
+          height: 90,
+          paddingBottom: 35,
+          paddingTop: 10,
+          elevation: 0,
+          shadowOpacity: 0,
         },
-        tabBarActiveTintColor: '#FFFFFF',
-        tabBarInactiveTintColor: '#404040',
+        tabBarActiveTintColor: '#C200FB',
+        tabBarInactiveTintColor: 'rgba(255,255,255,0.2)',
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: 'bold',
+          marginTop: 4,
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "PULSE",
-          tabBarIcon: ({ color }) => <Activity size={24} color={color} />,
+          title: "Pulse",
+          tabBarIcon: ({ color, focused }) => (
+            <Activity size={24} color={color} strokeWidth={focused ? 3 : 2} />
+          ),
         }}
       />
       <Tabs.Screen
         name="runway"
         options={{
-          title: "RUNWAY",
-          tabBarIcon: ({ color }) => <PlaneTakeoff size={24} color={color} />,
+          title: "Runway",
+          tabBarIcon: ({ color, focused }) => (
+            <PlaneTakeoff size={24} color={color} strokeWidth={focused ? 3 : 2} />
+          ),
         }}
       />
     </Tabs>

@@ -3,3 +3,17 @@
 @import "heroui-native/styles";
 
 @source '../node_modules/heroui-native/lib';
+
+@layer theme {
+  :root {
+    @variant dark {
+      --color-background: #00120B;
+      --color-foreground: #FFFFFF;
+      --color-primary: #C200FB;
+      --color-secondary: #C200FB;
+      --color-accent: #C200FB;
+      --color-muted: #1A1A1A;
+      --color-border: #333333;
+    }
+  }
+}

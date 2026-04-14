@@ -10,6 +10,8 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
+import { Uniwind } from "uniwind";
+import { useEffect } from "react";
 
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!);
 
@@ -24,6 +26,10 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  useEffect(() => {
+    Uniwind.setTheme("dark");
+  }, []);
+
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView className="flex-1">
@@ -34,7 +40,7 @@ export default function RootLayout() {
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               </Stack>
-              <StatusBar style="auto" />
+              <StatusBar style="light" />
             </ConvexAuthProvider>
           </HeroUINativeProvider>
         </KeyboardProvider>
