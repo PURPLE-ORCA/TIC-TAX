@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { 
-  Dialog, 
+  BottomSheet,
   Button, 
   Input, 
   Chip, 
@@ -31,8 +31,8 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
   const logTransaction = useMutation(api.transactions.logTransaction);
 
   const handleSubmit = async () => {
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) return;
+    const numAmount = Number.parseFloat(amount);
+    if (Number.isNaN(numAmount) || numAmount <= 0) return;
 
     setIsSubmitting(true);
     try {
@@ -53,13 +53,17 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
   };
 
   return (
-    <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
-      <Dialog.Portal className="justify-end p-0">
-        <Dialog.Overlay className="bg-black/60" />
-        <Dialog.Content 
-          className="bg-background rounded-t-[40px] border-t border-white/5 w-full pb-safe"
+    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
+      <BottomSheet.Portal>
+        <BottomSheet.Overlay className="bg-black/60" />
+        <BottomSheet.Content
+          index={0}
+          snapPoints={['88%']}
+          enableDynamicSizing={false}
+          enablePanDownToClose
+          backgroundClassName="bg-background rounded-t-[40px] border-t border-white/5"
         >
-          <View className="p-8 gap-8">
+          <View className="p-8 gap-8 pb-safe">
             <View className="items-center">
               <View className="w-12 h-1.5 bg-white/10 rounded-full mb-2" />
               <Text variant="large" className="text-foreground font-bold">New Transaction</Text>
@@ -159,9 +163,8 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
               )}
             </Button>
           </View>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+        </BottomSheet.Content>
+      </BottomSheet.Portal>
+    </BottomSheet>
   );
 }
-

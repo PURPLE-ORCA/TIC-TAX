@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { 
-  Dialog, 
+  BottomSheet,
   Button, 
   Input, 
   Label, 
@@ -24,8 +24,8 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
   const addSubscription = useMutation(api.subscriptions.addSubscription);
 
   const handleSubmit = async () => {
-    const cost = parseFloat(monthlyCost);
-    if (!name || isNaN(cost) || cost <= 0) return;
+    const cost = Number.parseFloat(monthlyCost);
+    if (!name || Number.isNaN(cost) || cost <= 0) return;
 
     setIsSubmitting(true);
     try {
@@ -44,13 +44,17 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
   };
 
   return (
-    <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
-      <Dialog.Portal className="justify-end p-0">
-        <Dialog.Overlay className="bg-black/60" />
-        <Dialog.Content 
-          className="bg-background w-full pb-safe"
+    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
+      <BottomSheet.Portal>
+        <BottomSheet.Overlay className="bg-black/60" />
+        <BottomSheet.Content
+          index={0}
+          snapPoints={['62%']}
+          enableDynamicSizing={false}
+          enablePanDownToClose
+          backgroundClassName="bg-background"
         >
-          <View className="p-8 gap-8">
+          <View className="p-8 gap-8 pb-safe">
             <View className="items-center">
               <Text variant="large">New SaaS Bleed</Text>
             </View>
@@ -92,8 +96,8 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
               )}
             </Button>
           </View>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+        </BottomSheet.Content>
+      </BottomSheet.Portal>
+    </BottomSheet>
   );
 }
