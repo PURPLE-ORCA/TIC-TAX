@@ -6,22 +6,47 @@ import { Text } from "@/src/components/ui/text";
 import { useFinance } from "@/src/hooks/useFinance";
 import { formatCurrency } from "@/src/lib/format-currency";
 import { formatRunway } from "@/src/lib/format-runway";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Flame, Skull } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
-import { FlatList, View } from "react-native";
+import { Alert, FlatList, TouchableOpacity, View } from "react-native";
 
 export default function RunwayScreen() {
   const { safeToSpend, isLoading: financeLoading } = useFinance();
   const subscriptions = useQuery(api.subscriptions.getSubscriptions) ?? [];
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const deleteSubscription = useMutation(api.subscriptions.deleteSubscription);
+
+  const handleDeleteSubscription = (id: (typeof subscriptions)[number]["_id"]) => {
+    Alert.alert(
+      "Kill Subscription?",
+      "Remove this from your monthly burn rate?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteSubscription({ id });
+            } catch (error) {
+              console.error("Failed to delete subscription:", error);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const monthlyBurn = useMemo(() => {
     return subscriptions.reduce((sum, sub) => sum + sub.monthlyCost, 0);
   }, [subscriptions]);
 
   const runwayMonths = useMemo(() => {
-    if (monthlyBurn === 0) return Infinity;
+    if (monthlyBurn === 0) return Number.POSITIVE_INFINITY;
     return safeToSpend / monthlyBurn;
   }, [safeToSpend, monthlyBurn]);
 
@@ -32,18 +57,20 @@ export default function RunwayScreen() {
   }: {
     item: (typeof subscriptions)[0];
   }) => (
-    <View className="flex-row justify-between items-center py-2 border-b border-white/5">
+    <TouchableOpacity
+      className="flex-row justify-between items-center py-2 border-b border-white/5"
+      onLongPress={() => handleDeleteSubscription(item._id)}
+      delayLongPress={300}
+    >
       <View className="flex-1 mr-4">
-        <Text numberOfLines={1}>
-          {item.name}
-        </Text>
+        <Text numberOfLines={1}>{item.name}</Text>
       </View>
       <View className="items-end">
         <Text className="text-primary text-xl">
           {formatCurrency(item.monthlyCost).replace("+ ", "")}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
