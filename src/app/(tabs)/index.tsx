@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
 import { SafeScreen } from '@/src/components/layout/SafeScreen';
 import { Text } from '@/src/components/ui/text';
 import { CustomButton } from '@/src/components/ui/custom-button';
@@ -11,6 +14,27 @@ import { formatCurrency } from '@/src/lib/format-currency';
 export default function PulseTab() {
   const { safeToSpend, taxHostage, recentTransactions, isLoading } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const deleteTransaction = useMutation(api.transactions.deleteTransaction);
+
+  const handleDeleteTransaction = (id: Id<'transactions'>) => {
+    Alert.alert('Delete Transaction?', undefined, [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteTransaction({ id });
+          } catch (error) {
+            console.error('Failed to delete transaction:', error);
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <SafeScreen safeArea="both" contentClassName="px-6 pt-12 pb-6">
@@ -63,7 +87,7 @@ export default function PulseTab() {
         
         <FlatList
           data={recentTransactions}
-          keyExtractor={(item: any) => item._id}
+          keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             !isLoading ? (
@@ -73,7 +97,11 @@ export default function PulseTab() {
             ) : null
           }
           renderItem={({ item: tx }) => (
-            <View className="flex-row justify-between py-4 border-b border-foreground/5">
+            <TouchableOpacity
+              className="flex-row justify-between py-4 border-b border-foreground/5"
+              onLongPress={() => handleDeleteTransaction(tx._id)}
+              delayLongPress={300}
+            >
               <Text variant="small" className="text-foreground/80">
                 {tx.category}
               </Text>
@@ -83,7 +111,7 @@ export default function PulseTab() {
               >
                 {formatCurrency(tx.type === "IN" ? tx.amount : -tx.amount)}
               </Text>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>

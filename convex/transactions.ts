@@ -56,3 +56,12 @@ export const getDashboardStats = query({
     };
   },
 });
+
+export const deleteTransaction = mutation({
+  args: {
+    id: v.id("transactions"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+  },
+});
