@@ -3,20 +3,14 @@ import { View } from 'react-native';
 import { SafeScreen } from '@/src/components/layout/SafeScreen';
 import { Text } from '@/src/components/ui/text';
 import { useFinance } from '@/src/hooks/useFinance';
-import { TransactionSheet } from '@/src/components/finance/TransactionSheet';
+import { TransactionSheet } from '@/src/components/screens/finance/TransactionSheet';
 import { Plus } from 'lucide-react-native';
 import { Button, Card } from 'heroui-native';
+import { formatCurrency } from '@/src/lib/format-currency';
 
 export default function PulseTab() {
   const { safeToSpend, taxHostage, isLoading } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
 
   return (
     <SafeScreen safeArea="both" contentClassName="justify-between">
