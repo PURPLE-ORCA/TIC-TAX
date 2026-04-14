@@ -65,7 +65,7 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
             {/* IN/OUT Toggle */}
             <View className="flex-row bg-white/5 p-1.5 rounded-2xl">
               <Button 
-                variant={type === 'IN' ? 'primary' : 'transparent'}
+                variant={type === 'IN' ? 'primary' : 'ghost'}
                 className={cn(
                   "flex-1 h-12 rounded-xl",
                   type === 'IN' ? "shadow-md shadow-primary/20" : ""
@@ -78,7 +78,7 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
                 </Button.Label>
               </Button>
               <Button 
-                variant={type === 'OUT' ? 'primary' : 'transparent'}
+                variant={type === 'OUT' ? 'primary' : 'ghost'}
                 className={cn(
                   "flex-1 h-12 rounded-xl",
                   type === 'OUT' ? "shadow-md shadow-primary/20" : ""
@@ -116,7 +116,7 @@ export function TransactionSheet({ isOpen, onOpenChange }: TransactionSheetProps
                     <Chip 
                       key={cat}
                       onPress={() => setCategory(cat)}
-                      variant={category === cat ? 'default' : 'secondary'}
+                      variant={category === cat ? 'danger' : 'accent'}
                       className={cn(
                         "px-5 py-2.5 rounded-xl border border-white/5",
                         category === cat ? "bg-primary border-primary" : "bg-white/5"

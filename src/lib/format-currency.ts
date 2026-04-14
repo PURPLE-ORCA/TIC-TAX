@@ -1,8 +1,9 @@
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('fr-MA', {
-    style: 'currency',
-    currency: 'MAD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Math.abs(amount));
+
+  const sign = amount >= 0 ? '+ ' : '- ';
+  return `${sign}${formatted} MAD`;
 }

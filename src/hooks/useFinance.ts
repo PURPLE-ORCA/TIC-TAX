@@ -8,6 +8,7 @@ export function useFinance() {
     safeToSpend: stats?.safeToSpend ?? 0,
     taxHostage: stats?.taxHostage ?? 0,
     totalBleed: stats?.totalBleed ?? 0,
+    recentTransactions: stats?.recentTransactions ?? [],
     isLoading: stats === undefined,
   };
 }
