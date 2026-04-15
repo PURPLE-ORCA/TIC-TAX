@@ -1,4 +1,6 @@
 import { api } from "@/convex/_generated/api";
+import { RenderIf } from "@/src/components/helpers/render-if";
+import { Show } from "@/src/components/helpers/show";
 import { Text } from "@/src/components/ui/text";
 import { useMutation } from "convex/react";
 import {
@@ -118,7 +120,7 @@ export function TransactionSheet({
               </Tabs.List>
             </Tabs>
 
-            {type === "IN" && (
+            <RenderIf condition={type === "IN"}>
               <View className="gap-3">
                 <Label>Income Mode</Label>
                 <Tabs
@@ -155,7 +157,7 @@ export function TransactionSheet({
                   </Tabs.List>
                 </Tabs>
               </View>
-            )}
+            </RenderIf>
 
             {/* Amount Input */}
             <TextField>
@@ -182,7 +184,7 @@ export function TransactionSheet({
             </TextField>
 
             {/* Category Chips (only for OUT) */}
-            {type === "OUT" && (
+            <RenderIf condition={type === "OUT"}>
               <View className="gap-3">
                 <Label>Category</Label>
                 <View className="flex-row flex-wrap gap-2">
@@ -211,7 +213,7 @@ export function TransactionSheet({
                   ))}
                 </View>
               </View>
-            )}
+            </RenderIf>
 
             {/* Submit Button */}
             <Button
@@ -219,18 +221,21 @@ export function TransactionSheet({
               onPress={handleSubmit}
               isDisabled={!amount || isSubmitting}
             >
-              {isSubmitting ? (
-                <Button.Label className="text-white font-bold text-lg">
-                  Logging...
-                </Button.Label>
-              ) : (
-                <>
-                  <Check color="white" size={24} strokeWidth={3} />
-                  <Button.Label className="text-white font-bold text-lg ml-2">
-                    Confirm
+              <Show>
+                <Show.When condition={isSubmitting}>
+                  <Button.Label className="text-white font-bold text-lg">
+                    Logging...
                   </Button.Label>
-                </>
-              )}
+                </Show.When>
+                <Show.Else>
+                  <>
+                    <Check color="white" size={24} strokeWidth={3} />
+                    <Button.Label className="text-white font-bold text-lg ml-2">
+                      Confirm
+                    </Button.Label>
+                  </>
+                </Show.Else>
+              </Show>
             </Button>
           </View>
         </BottomSheet.Content>

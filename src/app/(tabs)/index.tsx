@@ -1,6 +1,7 @@
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
+import { RenderIf } from "@/src/components/helpers/render-if";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
 import { formatCurrency } from "@/src/components/lib/format-currency";
@@ -112,18 +113,18 @@ export default function PulseTab() {
           >
             <Card
               variant="transparent"
-              className="p-6 rounded-xl border border-red-500/20 bg-red-500/5"
+              className="p-4 rounded-xl border border-red-500/20 bg-red-500/5"
             >
               <Text variant="smallBold" className="text-red-500/60 mb-1">
                 Tax Hostage
               </Text>
-              <Text variant="subtitle" className="text-red-500">
+              <Text variant="large" className="text-red-500">
                 {isLoading ? "..." : formatCurrency(taxHostage)}
               </Text>
             </Card>
           </TouchableOpacity>
 
-          {pendingCapital > 0 && (
+          <RenderIf condition={pendingCapital > 0}>
             <Card
               variant="transparent"
               className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5"
@@ -135,12 +136,12 @@ export default function PulseTab() {
                 {isLoading ? "..." : formatCurrency(pendingCapital)}
               </Text>
             </Card>
-          )}
+          </RenderIf>
         </View>
       </View>
 
       {/* Trigger */}
-      <View className="mt-8 mb-10">
+      <View className="my-6">
         <CustomButton
           variant="secondary"
           label="New Transaction"
@@ -157,7 +158,9 @@ export default function PulseTab() {
           keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            !isLoading ? <Text>No transactions yet.</Text> : null
+            <RenderIf condition={!isLoading}>
+              <Text>No transactions yet.</Text>
+            </RenderIf>
           }
           renderItem={({ item: tx }) => (
             <TouchableOpacity
