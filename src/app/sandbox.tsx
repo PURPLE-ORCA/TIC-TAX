@@ -3,7 +3,7 @@ import { SafeScreen } from '@/src/components/layout/SafeScreen';
 import { CustomButton } from '@/src/components/ui/custom-button';
 import { Text } from '@/src/components/ui/text';
 import { useFinance } from '@/src/components/hooks/useFinance';
-import { formatCurrency } from '@/src/lib/format-currency';
+import { formatCurrency } from '@/src/components/lib/format-currency';
 import { useMutation } from 'convex/react';
 import { useRouter } from 'expo-router';
 import { Button, Input, Label, TextField } from 'heroui-native';
@@ -179,7 +179,7 @@ export default function SandboxScreen() {
           </View>
           <View className="flex-1">
             <TextField>
-              <Label>Cost (MAD)</Label>
+              <Label>Cost </Label>
               <Input
                 placeholder="499"
                 value={itemCost}
