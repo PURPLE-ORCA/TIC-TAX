@@ -54,7 +54,7 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
           enablePanDownToClose
           backgroundClassName="bg-background"
         >
-          <View className="p-8 gap-8 pb-safe">
+          <View className="gap-8 pb-safe">
             <View className="items-center">
               <Text variant="large">New SaaS Bleed</Text>
             </View>

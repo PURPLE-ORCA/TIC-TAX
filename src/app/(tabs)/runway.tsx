@@ -83,20 +83,20 @@ export default function RunwayScreen() {
   );
 
   return (
-    <SafeScreen safeArea="both" contentClassName="px-6">
-      <View className="pt-6 mb-2 flex-row justify-end">
+    <SafeScreen safeArea="both">
+      <View className="flex-row justify-end">
         <TouchableOpacity
-          className="h-12 w-12 items-center justify-center rounded-xl border border-primary bg-primary/10"
+          className="size-12 items-center justify-center rounded-xl"
           onPress={() => router.push("/sandbox")}
           accessibilityRole="button"
           accessibilityLabel="Open opportunity cost sandbox"
         >
-          <Calculator size={18} color="#3b82f6" />
+          <Calculator size={18} color="#c200fb" />
         </TouchableOpacity>
       </View>
 
       {/* Top Section: The Survival Clock */}
-      <View className="items-center py-12 gap-2">
+      <View className="items-center py-2 gap-2">
         <View className="flex-row items-center gap-2 mb-2">
           {isCritical ? (
             <Skull size={14} color="#ef4444" />

@@ -64,13 +64,9 @@ export default function PulseTab() {
   };
 
   return (
-    <SafeScreen safeArea="both" contentClassName="px-6 pt-12 pb-6">
+    <SafeScreen safeArea="both">
       {/* Header */}
       <View>
-        <Text variant="title" className="mb-4">
-          Pulse
-        </Text>
-
         <View className="gap-4">
           <Card variant="transparent" className="p-6 border rounded-xl">
             <Text variant="smallBold" className="text-foreground/40 mb-1">
