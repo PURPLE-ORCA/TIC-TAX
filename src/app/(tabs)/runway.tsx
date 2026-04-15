@@ -7,12 +7,14 @@ import { useFinance } from "@/src/hooks/useFinance";
 import { formatCurrency } from "@/src/lib/format-currency";
 import { formatRunway } from "@/src/lib/format-runway";
 import { useMutation, useQuery } from "convex/react";
+import { useRouter } from "expo-router";
 import { Button, Dialog } from "heroui-native";
-import { Flame, Skull } from "lucide-react-native";
+import { Calculator, Flame, Skull } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 export default function RunwayScreen() {
+  const router = useRouter();
   const { safeToSpend, isLoading: financeLoading } = useFinance();
   const subscriptions = useQuery(api.subscriptions.getSubscriptions) ?? [];
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -82,6 +84,17 @@ export default function RunwayScreen() {
 
   return (
     <SafeScreen safeArea="both" contentClassName="px-6">
+      <View className="pt-6 mb-2 flex-row justify-end">
+        <TouchableOpacity
+          className="h-12 w-12 items-center justify-center rounded-xl border border-primary bg-primary/10"
+          onPress={() => router.push("/sandbox")}
+          accessibilityRole="button"
+          accessibilityLabel="Open opportunity cost sandbox"
+        >
+          <Calculator size={18} color="#3b82f6" />
+        </TouchableOpacity>
+      </View>
+
       {/* Top Section: The Survival Clock */}
       <View className="items-center py-12 gap-2">
         <View className="flex-row items-center gap-2 mb-2">
