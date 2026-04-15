@@ -7,38 +7,45 @@ import { useFinance } from "@/src/hooks/useFinance";
 import { formatCurrency } from "@/src/lib/format-currency";
 import { formatRunway } from "@/src/lib/format-runway";
 import { useMutation, useQuery } from "convex/react";
+import { Button, Dialog } from "heroui-native";
 import { Flame, Skull } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
-import { Alert, FlatList, TouchableOpacity, View } from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 
 export default function RunwayScreen() {
   const { safeToSpend, isLoading: financeLoading } = useFinance();
   const subscriptions = useQuery(api.subscriptions.getSubscriptions) ?? [];
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<
+    (typeof subscriptions)[number]["_id"] | null
+  >(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const deleteSubscription = useMutation(api.subscriptions.deleteSubscription);
 
-  const handleDeleteSubscription = (id: (typeof subscriptions)[number]["_id"]) => {
-    Alert.alert(
-      "Kill Subscription?",
-      "Remove this from your monthly burn rate?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteSubscription({ id });
-            } catch (error) {
-              console.error("Failed to delete subscription:", error);
-            }
-          },
-        },
-      ],
-    );
+  const openDeleteDialog = (id: (typeof subscriptions)[number]["_id"]) => {
+    setPendingDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteDialogChange = (open: boolean) => {
+    setIsDeleteDialogOpen(open);
+    if (!open) setPendingDeleteId(null);
+  };
+
+  const confirmDeleteSubscription = async () => {
+    if (!pendingDeleteId || isDeleting) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteSubscription({ id: pendingDeleteId });
+      setIsDeleteDialogOpen(false);
+      setPendingDeleteId(null);
+    } catch (error) {
+      console.error("Failed to delete subscription:", error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const monthlyBurn = useMemo(() => {
@@ -59,7 +66,7 @@ export default function RunwayScreen() {
   }) => (
     <TouchableOpacity
       className="flex-row justify-between items-center py-2 border-b border-white/5"
-      onLongPress={() => handleDeleteSubscription(item._id)}
+      onLongPress={() => openDeleteDialog(item._id)}
       delayLongPress={300}
     >
       <View className="flex-1 mr-4">
@@ -166,6 +173,34 @@ export default function RunwayScreen() {
       </View>
 
       <SubscriptionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
+
+      <Dialog isOpen={isDeleteDialogOpen} onOpenChange={handleDeleteDialogChange}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="bg-black/60" />
+          <Dialog.Content className="mx-6 rounded-2xl border border-foreground/10 bg-background p-6">
+            <Dialog.Close variant="ghost" />
+            <View className="mb-6 gap-1.5">
+              <Dialog.Title>Kill Subscription?</Dialog.Title>
+              <Dialog.Description>
+                Remove this from monthly burn rate?
+              </Dialog.Description>
+            </View>
+            <View className="flex-row justify-end gap-3">
+              <Button variant="tertiary" size="sm" onPress={() => handleDeleteDialogChange(false)}>
+                <Button.Label>Cancel</Button.Label>
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onPress={confirmDeleteSubscription}
+                isDisabled={isDeleting}
+              >
+                <Button.Label>{isDeleting ? "Deleting..." : "Delete"}</Button.Label>
+              </Button>
+            </View>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
     </SafeScreen>
   );
 }
