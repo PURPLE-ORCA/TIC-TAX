@@ -82,7 +82,7 @@ export default function LoginScreen() {
               We've sent a magic link to {email}
             </Text>
             <Button
-              variant="transparent"
+              variant="tertiary"
               className="mt-6"
               onPress={() => setStep('signin')}
             >

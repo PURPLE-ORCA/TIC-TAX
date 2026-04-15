@@ -150,8 +150,10 @@ export default function PulseTab() {
       </View>
 
       {/* Recent Transactions List */}
-      <View className="flex-1">
-        <Text className="mb-4">Recent Activity</Text>
+      <View className="flex-1 bg-red-600">
+        <Text variant="smallBold" className="mb-2">
+          Recent Activity
+        </Text>
 
         <FlatList
           data={recentTransactions}
@@ -164,7 +166,7 @@ export default function PulseTab() {
           }
           renderItem={({ item: tx }) => (
             <TouchableOpacity
-              className="flex-row justify-between py-4 border-b border-foreground/5"
+              className="flex-row justify-between py-2 border-b border-foreground/5"
               onLongPress={() => {
                 if (tx.type === "IN" && tx.status === "PENDING") {
                   openClearDialog(tx._id);
@@ -176,11 +178,6 @@ export default function PulseTab() {
             >
               <Text
                 variant={tx.note ? "default" : "small"}
-                className={
-                  tx.note
-                    ? "text-foreground font-semibold"
-                    : "text-foreground/80"
-                }
               >
                 {tx.note || tx.category}
               </Text>

@@ -28,10 +28,19 @@ export function SafeScreen({
 }: SafeScreenProps) {
   const safeAreaClasses = safeStyles[safeArea];
 
+  if (!scrollable) {
+    return (
+      <View className={`flex-1 bg-background ${className}`} {...props}>
+        <View className={`flex-1 px-2 ${safeAreaClasses} ${contentClassName}`}>
+          {children}
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View className={`flex-1 bg-background ${className}`} {...props}>
       <KeyboardAwareScrollView
-        scrollEnabled={scrollable}
         showsVerticalScrollIndicator={false}
         className="flex-1 px-2"
         contentContainerClassName={`grow ${safeAreaClasses} ${contentClassName}`}
