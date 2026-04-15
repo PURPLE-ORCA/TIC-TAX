@@ -1,11 +1,11 @@
 import { api } from "@/convex/_generated/api";
 import { SubscriptionSheet } from "@/src/components/finance/SubscriptionSheet";
+import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
+import { formatCurrency } from "@/src/components/lib/format-currency";
+import { formatRunway } from "@/src/components/lib/format-runway";
 import { CustomButton } from "@/src/components/ui/custom-button";
 import { Text } from "@/src/components/ui/text";
-import { useFinance } from "@/src/hooks/useFinance";
-import { formatCurrency } from "@/src/lib/format-currency";
-import { formatRunway } from "@/src/lib/format-runway";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "expo-router";
 import { Button, Dialog } from "heroui-native";
@@ -120,25 +120,19 @@ export default function RunwayScreen() {
           >
             {formatRunway(runwayMonths)}
           </Text>
-          <Text>
-            Survival Time
-          </Text>
+          <Text>Survival Time</Text>
         </View>
 
         <View className="border-primary px-8 py-4 rounded-xl flex-row items-center gap-6 border">
           <View>
-            <Text variant="small">
-              Monthly Burn
-            </Text>
+            <Text variant="small">Monthly Burn</Text>
             <Text className="text-foreground text-xl">
               {formatCurrency(monthlyBurn).replace("+ ", "")}
             </Text>
           </View>
           <View className="w-px h-10 bg-primary" />
           <View>
-            <Text variant="small">
-              Safe Capital
-            </Text>
+            <Text variant="small">Safe Capital</Text>
             <Text className="text-foreground text-xl">
               {financeLoading
                 ? "..."
@@ -151,9 +145,7 @@ export default function RunwayScreen() {
       {/* Middle Section: The SaaS Bleed */}
       <View className="flex-1 mt-6">
         <View className="flex-row justify-between items-center mb-6">
-          <Text variant="smallBold">
-            The SaaS Bleed
-          </Text>
+          <Text variant="smallBold">The SaaS Bleed</Text>
           <View className="bg-primary/10 px-2 py-0.5 rounded-md">
             <Text variant="xs" className="text-primary">
               {subscriptions.length} ACTIVE
@@ -168,9 +160,7 @@ export default function RunwayScreen() {
           scrollEnabled={false}
           ListEmptyComponent={
             <View className="py-20 items-center opacity-20 border border-dashed border-white/10 rounded-3xl">
-              <Text variant="small">
-                Zero Parasites Detected
-              </Text>
+              <Text variant="small">Zero Parasites Detected</Text>
             </View>
           }
         />
@@ -187,7 +177,10 @@ export default function RunwayScreen() {
 
       <SubscriptionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
-      <Dialog isOpen={isDeleteDialogOpen} onOpenChange={handleDeleteDialogChange}>
+      <Dialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={handleDeleteDialogChange}
+      >
         <Dialog.Portal>
           <Dialog.Overlay className="bg-black/60" />
           <Dialog.Content className="mx-6 rounded-2xl border border-foreground/10 bg-background p-6">
@@ -199,7 +192,11 @@ export default function RunwayScreen() {
               </Dialog.Description>
             </View>
             <View className="flex-row justify-end gap-3">
-              <Button variant="tertiary" size="sm" onPress={() => handleDeleteDialogChange(false)}>
+              <Button
+                variant="tertiary"
+                size="sm"
+                onPress={() => handleDeleteDialogChange(false)}
+              >
                 <Button.Label>Cancel</Button.Label>
               </Button>
               <Button
@@ -208,7 +205,9 @@ export default function RunwayScreen() {
                 onPress={confirmDeleteSubscription}
                 isDisabled={isDeleting}
               >
-                <Button.Label>{isDeleting ? "Deleting..." : "Delete"}</Button.Label>
+                <Button.Label>
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Button.Label>
               </Button>
             </View>
           </Dialog.Content>

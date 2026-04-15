@@ -33,7 +33,7 @@ export function SafeScreen({
       <KeyboardAwareScrollView
         scrollEnabled={scrollable}
         showsVerticalScrollIndicator={false}
-        className="flex-1 px-safe"
+        className="flex-1 px-2"
         contentContainerClassName={`grow ${safeAreaClasses} ${contentClassName}`}
         keyboardShouldPersistTaps="handled"
         bottomOffset={20}
