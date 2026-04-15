@@ -1,12 +1,13 @@
 import { api } from '@/convex/_generated/api';
 import { SafeScreen } from '@/src/components/layout/SafeScreen';
+import { CustomButton } from '@/src/components/ui/custom-button';
 import { Text } from '@/src/components/ui/text';
-import { useFinance } from '@/src/hooks/useFinance';
+import { useFinance } from '@/src/components/hooks/useFinance';
 import { formatCurrency } from '@/src/lib/format-currency';
 import { useMutation } from 'convex/react';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Button, Input, Label, TextField } from 'heroui-native';
-import { Trash2, X } from 'lucide-react-native';
+import { Skull, X, Zap } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 
@@ -17,6 +18,7 @@ type SandboxItem = {
 };
 
 export default function SandboxScreen() {
+  const router = useRouter();
   const { safeToSpend, totalBleed } = useFinance();
   const logTransaction = useMutation(api.transactions.logTransaction);
 
@@ -27,8 +29,8 @@ export default function SandboxScreen() {
 
   const totalCartCost = useMemo(() => cart.reduce((sum, item) => sum + item.cost, 0), [cart]);
   const remainingCapital = useMemo(() => safeToSpend - totalCartCost, [safeToSpend, totalCartCost]);
-  const originalRunway = useMemo(() => safeToSpend / totalBleed, [safeToSpend, totalBleed]);
-  const newRunway = useMemo(() => remainingCapital / totalBleed, [remainingCapital, totalBleed]);
+  const originalRunway = useMemo(() => totalBleed > 0 ? safeToSpend / totalBleed : 0, [safeToSpend, totalBleed]);
+  const newRunway = useMemo(() => totalBleed > 0 ? remainingCapital / totalBleed : 0, [remainingCapital, totalBleed]);
   const runwayLostDays = useMemo(() => (originalRunway - newRunway) * 30, [originalRunway, newRunway]);
   const hustleRequired = useMemo(() => totalCartCost / 0.99, [totalCartCost]);
 
@@ -75,94 +77,131 @@ export default function SandboxScreen() {
     }
   };
 
+  const renderCartItem = ({ item }: { item: SandboxItem }) => (
+    <TouchableOpacity
+      className="flex-row justify-between items-center py-4 border-b border-foreground/5"
+      onLongPress={() => removeFromSandbox(item.id)}
+      delayLongPress={300}
+    >
+      <View className="flex-1 mr-4">
+        <Text numberOfLines={1}>{item.name}</Text>
+      </View>
+      <View className="items-end">
+        <Text variant="price" className="text-red-500">
+          -{formatCurrency(item.cost).replace("+ ", "")}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <SafeScreen safeArea="both" contentClassName="px-6 pt-6 pb-8 gap-6">
-      <View className="flex-row items-center justify-between border border-foreground/20 bg-background px-4 py-3">
-        <Text variant="smallBold">Sandbox</Text>
-        <TouchableOpacity
-          className="h-9 w-9 items-center justify-center border border-foreground/20"
+    <SafeScreen safeArea="both">
+      {/* Header */}
+      <View className="flex-row items-center justify-between">
+        <Text variant="title">Sandbox</Text>
+        <Button 
+          variant="tertiary" 
+          size="sm" 
           onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Close sandbox"
         >
-          <X size={16} color="#a1a1aa" />
-        </TouchableOpacity>
+          <X size={20} color="#a1a1aa" />
+        </Button>
       </View>
 
-      <View className="border-2 border-red-500 bg-red-500/5 p-5">
-        <Text variant="small" className="text-red-400 uppercase tracking-widest">
-          Impact Panel
-        </Text>
-        <Text className="mt-2 text-4xl text-red-500">- {Math.max(0, runwayLostDays).toFixed(0)} Days</Text>
-        <Text className="mt-2 text-foreground/70">
-          Requires {formatCurrency(Math.max(0, hustleRequired)).replace('+ ', '')} in new invoices
-        </Text>
+      {/* Impact Section: The Opportunity Cost */}
+      <View className="items-center py-4 gap-2">
+        <View className="flex-row items-center gap-2 mb-2">
+          <Skull size={14} color="#ef4444" />
+          <Text variant="small" className="text-red-500 font-bold">
+            OPPORTUNITY COST
+          </Text>
+        </View>
+
+        <View className="items-center">
+          <Text
+          variant='title'
+            className="text-red-500 font-bold"
+          >
+            -{Math.max(0, runwayLostDays).toFixed(0)}
+          </Text>
+          <Text variant="smallBold" className="text-red-500/60 uppercase tracking-widest">
+            Days of Survival Lost
+          </Text>
+        </View>
+
+        <View className="mt-2 px-6 py-2 rounded-2xl bg-foreground/5 items-center">
+          <Text variant="xs" className="text-center">
+            Requires {formatCurrency(Math.max(0, hustleRequired)).replace('+ ', '')} in new invoices to offset
+          </Text>
+        </View>
       </View>
 
-      <View className="flex-1 border border-foreground/20 p-4">
-        <Text variant="smallBold" className="mb-3 uppercase tracking-widest">
-          Cart
-        </Text>
+      {/* Middle Section: The Regret List */}
+      <View className="flex-1 mt-6">
+        <View className="flex-row justify-between items-center mb-4">
+          <Text variant="smallBold">
+            The Regret List
+          </Text>
+          <View className="bg-red-500/10 px-2 py-0.5 rounded-md">
+            <Text variant="xs" className="text-red-500">
+              {cart.length} ITEMS
+            </Text>
+          </View>
+        </View>
 
         <FlatList
           data={cart}
+          renderItem={renderCartItem}
           keyExtractor={(item) => item.id}
-          ListEmptyComponent={<Text className="text-foreground/50">No items yet. Add regret below.</Text>}
-          renderItem={({ item }) => (
-            <View className="mb-3 flex-row items-center justify-between border border-foreground/10 px-3 py-2">
-              <View className="mr-3 flex-1">
-                <Text numberOfLines={1}>{item.name}</Text>
-                <Text className="text-primary">{formatCurrency(item.cost).replace('+ ', '')}</Text>
-              </View>
-              <Button variant="danger" size="sm" onPress={() => removeFromSandbox(item.id)}>
-                <Trash2 size={14} color="#ffffff" />
-                <Button.Label className="ml-1">Remove</Button.Label>
-              </Button>
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View className="py-20 items-center">
+              <Text variant="small" className="text-foreground/20">
+                Zero Regrets Detected
+              </Text>
             </View>
-          )}
+          }
         />
       </View>
 
-      <View className="gap-3 border border-foreground/20 p-4">
-        <Text variant="smallBold" className="uppercase tracking-widest">
-          Input Panel
-        </Text>
-        <TextField>
-          <Label>Item Name</Label>
-          <Input
-            placeholder="New headset"
-            value={itemName}
-            onChangeText={setItemName}
-            selectionColorClassName="accent-primary"
-          />
-        </TextField>
-        <TextField>
-          <Label>Cost (MAD)</Label>
-          <Input
-            placeholder="499"
-            value={itemCost}
-            onChangeText={setItemCost}
-            keyboardType="decimal-pad"
-            selectionColorClassName="accent-primary"
-          />
-        </TextField>
-        <Button variant="secondary" onPress={addToSandbox}>
-          <Button.Label>Add to Sandbox</Button.Label>
-        </Button>
-      </View>
+      {/* Bottom Section: Input & Action */}
+      <View className="gap-4 pt-6">
+        <View className="flex-row gap-3">
+          <View className="flex-1">
+            <TextField>
+              <Label>Item</Label>
+              <Input
+                placeholder="New headset"
+                value={itemName}
+                onChangeText={setItemName}
+              />
+            </TextField>
+          </View>
+          <View className="flex-1">
+            <TextField>
+              <Label>Cost (MAD)</Label>
+              <Input
+                placeholder="499"
+                value={itemCost}
+                onChangeText={setItemCost}
+                keyboardType="decimal-pad"
+              />
+            </TextField>
+          </View>
+        </View>
 
-      <View className="gap-1 border border-primary bg-primary/10 p-4">
-        <Text className="text-foreground/70">Remaining Capital: {formatCurrency(remainingCapital)}</Text>
-        <Text className="text-foreground/70">Original Runway: {Number.isFinite(originalRunway) ? originalRunway.toFixed(2) : 'INF'} mo</Text>
-        <Text className="text-foreground/70">New Runway: {Number.isFinite(newRunway) ? newRunway.toFixed(2) : 'INF'} mo</Text>
-        <Button
+        <CustomButton
+          variant="secondary"
+          label="Add to Sandbox"
+          onPress={addToSandbox}
+        />
+
+        <CustomButton
           variant="primary"
-          className="mt-2"
+          label={isExecuting ? 'Executing...' : 'Execute Trade'}
           onPress={executeTrade}
           isDisabled={cart.length === 0 || isExecuting}
-        >
-          <Button.Label>{isExecuting ? 'Executing...' : 'Execute Trade'}</Button.Label>
-        </Button>
+        />
       </View>
     </SafeScreen>
   );
