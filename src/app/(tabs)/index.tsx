@@ -150,53 +150,53 @@ export default function PulseTab() {
       </View>
 
       {/* Recent Transactions List */}
-      <View className="flex-1 bg-red-600">
-        <Text variant="smallBold" className="mb-2">
-          Recent Activity
-        </Text>
-
-        <FlatList
-          data={recentTransactions}
-          keyExtractor={(item) => item._id}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <RenderIf condition={!isLoading}>
-              <Text>No transactions yet.</Text>
-            </RenderIf>
-          }
-          renderItem={({ item: tx }) => (
-            <TouchableOpacity
-              className="flex-row justify-between py-2 border-b border-foreground/5"
-              onLongPress={() => {
-                if (tx.type === "IN" && tx.status === "PENDING") {
-                  openClearDialog(tx._id);
-                  return;
-                }
-                openDeleteDialog(tx._id);
-              }}
-              delayLongPress={300}
+      <FlatList
+        data={recentTransactions}
+        keyExtractor={(item) => item._id}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <Text variant="smallBold" className="mb-2">
+            Recent Activity
+          </Text>
+        }
+        ListEmptyComponent={
+          <RenderIf condition={!isLoading}>
+            <Text>No transactions yet.</Text>
+          </RenderIf>
+        }
+        renderItem={({ item: tx }) => (
+          <TouchableOpacity
+            className="flex-row justify-between py-2 border-b border-foreground/5"
+            onLongPress={() => {
+              if (tx.type === "IN" && tx.status === "PENDING") {
+                openClearDialog(tx._id);
+                return;
+              }
+              openDeleteDialog(tx._id);
+            }}
+            delayLongPress={300}
+          >
+            <Text
+              variant={tx.note ? "default" : "small"}
             >
-              <Text
-                variant={tx.note ? "default" : "small"}
-              >
-                {tx.note || tx.category}
-              </Text>
-              <Text
-                variant="smallBold"
-                className={
-                  tx.type === "IN"
-                    ? tx.status === "PENDING"
-                      ? "text-yellow-500"
-                      : "text-green-500"
-                    : "text-foreground/40"
-                }
-              >
-                {formatCurrency(tx.type === "IN" ? tx.amount : -tx.amount)}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+              {tx.note || tx.category}
+            </Text>
+            <Text
+              variant="smallBold"
+              className={
+                tx.type === "IN"
+                  ? tx.status === "PENDING"
+                    ? "text-yellow-500"
+                    : "text-green-500"
+                  : "text-foreground/40"
+              }
+            >
+              {formatCurrency(tx.type === "IN" ? tx.amount : -tx.amount)}
+            </Text>
+          </TouchableOpacity>
+        )}
+        contentContainerClassName="flex-1"
+      />
 
       <TransactionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
