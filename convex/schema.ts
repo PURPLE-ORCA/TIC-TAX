@@ -3,8 +3,9 @@ import { v } from "convex/values";
 
 export default defineSchema({
   transactions: defineTable({
-    amount: v.number(), 
+    amount: v.number(),
     type: v.union(v.literal("IN"), v.literal("OUT")),
+    status: v.optional(v.union(v.literal("PENDING"), v.literal("CLEARED"))),
     category: v.string(),
     taxAmount: v.number(),
     taxCleared: v.optional(v.boolean()),

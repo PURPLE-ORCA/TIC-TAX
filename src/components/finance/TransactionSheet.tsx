@@ -29,6 +29,7 @@ export function TransactionSheet({
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [type, setType] = useState<"IN" | "OUT">("OUT");
+  const [isPending, setIsPending] = useState(false);
   const [category, setCategory] = useState("Junk");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,11 +44,13 @@ export function TransactionSheet({
       await logTransaction({
         amount: numAmount,
         type,
+        status: type === "IN" && isPending ? "PENDING" : "CLEARED",
         category: type === "IN" ? "Income" : category,
         note: note.trim() || undefined,
       });
       setAmount("");
       setNote("");
+      setIsPending(false);
       onOpenChange(false);
     } catch (error) {
       console.error("Failed to log transaction:", error);
@@ -77,8 +80,14 @@ export function TransactionSheet({
             {/* IN/OUT Toggle */}
             <Tabs
               value={type}
-              onValueChange={(value) => setType(value as "IN" | "OUT")}
-              variant="primary"
+              onValueChange={(value) => {
+                const nextType = value as "IN" | "OUT";
+                setType(nextType);
+                if (nextType === "OUT") {
+                  setIsPending(false);
+                }
+              }}
+              variant="secondary"
             >
               <Tabs.List className="rounded-xl">
                 <Tabs.Indicator className="rounded-xl" />
@@ -108,6 +117,45 @@ export function TransactionSheet({
                 </Tabs.Trigger>
               </Tabs.List>
             </Tabs>
+
+            {type === "IN" && (
+              <View className="gap-3">
+                <Label>Income Mode</Label>
+                <Tabs
+                  value={isPending ? "PENDING" : "CLEARED"}
+                  onValueChange={(value) => setIsPending(value === "PENDING")}
+                  variant="secondary"
+                >
+                  <Tabs.List className="rounded-xl">
+                    <Tabs.Indicator className="rounded-xl" />
+                    <Tabs.Trigger value="CLEARED" className="rounded-xl flex-1">
+                      {({ isSelected }) => (
+                        <Tabs.Label
+                          className={cn(
+                            "font-semibold",
+                            isSelected ? "text-white" : "text-foreground/50",
+                          )}
+                        >
+                          Cash Received
+                        </Tabs.Label>
+                      )}
+                    </Tabs.Trigger>
+                    <Tabs.Trigger value="PENDING" className="rounded-xl flex-1">
+                      {({ isSelected }) => (
+                        <Tabs.Label
+                          className={cn(
+                            "font-semibold",
+                            isSelected ? "text-white" : "text-foreground/50",
+                          )}
+                        >
+                          Invoice Sent
+                        </Tabs.Label>
+                      )}
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                </Tabs>
+              </View>
+            )}
 
             {/* Amount Input */}
             <TextField>

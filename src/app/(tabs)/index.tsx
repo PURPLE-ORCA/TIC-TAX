@@ -12,16 +12,20 @@ import React, { useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 export default function PulseTab() {
-  const { safeToSpend, taxHostage, recentTransactions, isLoading } =
-    useFinance();
+  const { safeToSpend, taxHostage, pendingCapital, recentTransactions, isLoading } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] =
     useState<Id<"transactions"> | null>(null);
+  const [pendingClearId, setPendingClearId] =
+    useState<Id<"transactions"> | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
   const [isTaxesDialogOpen, setIsTaxesDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isClearingInvoice, setIsClearingInvoice] = useState(false);
   const [isPayingTaxes, setIsPayingTaxes] = useState(false);
   const deleteTransaction = useMutation(api.transactions.deleteTransaction);
+  const clearInvoice = useMutation(api.transactions.clearInvoice);
   const markTaxesPaid = useMutation(api.transactions.markTaxesPaid);
 
   const openDeleteDialog = (id: Id<"transactions">) => {
@@ -32,6 +36,16 @@ export default function PulseTab() {
   const handleDeleteDialogChange = (open: boolean) => {
     setIsDeleteDialogOpen(open);
     if (!open) setPendingDeleteId(null);
+  };
+
+  const openClearDialog = (id: Id<"transactions">) => {
+    setPendingClearId(id);
+    setIsClearDialogOpen(true);
+  };
+
+  const handleClearDialogChange = (open: boolean) => {
+    setIsClearDialogOpen(open);
+    if (!open) setPendingClearId(null);
   };
 
   const confirmDeleteTransaction = async () => {
@@ -46,6 +60,21 @@ export default function PulseTab() {
       console.error("Failed to delete transaction:", error);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const confirmClearInvoice = async () => {
+    if (!pendingClearId || isClearingInvoice) return;
+
+    setIsClearingInvoice(true);
+    try {
+      await clearInvoice({ id: pendingClearId });
+      setIsClearDialogOpen(false);
+      setPendingClearId(null);
+    } catch (error) {
+      console.error("Failed to clear invoice:", error);
+    } finally {
+      setIsClearingInvoice(false);
     }
   };
 
@@ -93,6 +122,20 @@ export default function PulseTab() {
               </Text>
             </Card>
           </TouchableOpacity>
+
+          {pendingCapital > 0 && (
+            <Card
+              variant="transparent"
+              className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5"
+            >
+              <Text variant="smallBold" className="text-yellow-500/70 mb-1">
+                Awaiting Client Payment
+              </Text>
+              <Text variant="large" className="text-yellow-500">
+                {isLoading ? "..." : formatCurrency(pendingCapital)}
+              </Text>
+            </Card>
+          )}
         </View>
       </View>
 
@@ -119,7 +162,13 @@ export default function PulseTab() {
           renderItem={({ item: tx }) => (
             <TouchableOpacity
               className="flex-row justify-between py-4 border-b border-foreground/5"
-              onLongPress={() => openDeleteDialog(tx._id)}
+              onLongPress={() => {
+                if (tx.type === "IN" && tx.status === "PENDING") {
+                  openClearDialog(tx._id);
+                  return;
+                }
+                openDeleteDialog(tx._id);
+              }}
               delayLongPress={300}
             >
               <Text
@@ -135,7 +184,11 @@ export default function PulseTab() {
               <Text
                 variant="smallBold"
                 className={
-                  tx.type === "IN" ? "text-green-500" : "text-foreground/40"
+                  tx.type === "IN"
+                    ? tx.status === "PENDING"
+                      ? "text-yellow-500"
+                      : "text-green-500"
+                    : "text-foreground/40"
                 }
               >
                 {formatCurrency(tx.type === "IN" ? tx.amount : -tx.amount)}
@@ -177,6 +230,40 @@ export default function PulseTab() {
               >
                 <Button.Label>
                   {isDeleting ? "Deleting..." : "Delete"}
+                </Button.Label>
+              </Button>
+            </View>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
+
+      <Dialog isOpen={isClearDialogOpen} onOpenChange={handleClearDialogChange}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="bg-black/60" />
+          <Dialog.Content className="mx-6 rounded-2xl border border-foreground/10 bg-background p-6">
+            <Dialog.Close variant="ghost" />
+            <View className="mb-6 gap-1.5">
+              <Dialog.Title>Mark Invoice as Paid?</Dialog.Title>
+              <Dialog.Description>
+                This moves the amount into real capital and applies the 1% tax.
+              </Dialog.Description>
+            </View>
+            <View className="flex-row justify-end gap-3">
+              <Button
+                variant="tertiary"
+                size="sm"
+                onPress={() => handleClearDialogChange(false)}
+              >
+                <Button.Label>Cancel</Button.Label>
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onPress={confirmClearInvoice}
+                isDisabled={isClearingInvoice}
+              >
+                <Button.Label>
+                  {isClearingInvoice ? "Confirming..." : "Confirm"}
                 </Button.Label>
               </Button>
             </View>

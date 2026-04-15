@@ -1,20 +1,23 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export const logTransaction = mutation({
   args: {
     amount: v.number(),
     type: v.union(v.literal("IN"), v.literal("OUT")),
+    status: v.optional(v.union(v.literal("PENDING"), v.literal("CLEARED"))),
     category: v.string(),
     note: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // The 1% Tax Logic: Only applies to Income.
-    const taxAmount = args.type === "IN" ? args.amount * 0.01 : 0;
+    const status = args.status ?? "CLEARED";
+    const taxAmount =
+      args.type === "IN" && status === "CLEARED" ? args.amount * 0.01 : 0;
 
     await ctx.db.insert("transactions", {
       amount: args.amount,
       type: args.type,
+      status,
       category: args.category,
       taxAmount: taxAmount,
       timestamp: Date.now(),
@@ -32,9 +35,16 @@ export const getDashboardStats = query({
     let totalOut = 0;
     let totalTax = 0;
     let taxHostage = 0;
+    let pendingCapital = 0;
 
     for (const tx of allTxs) {
       if (tx.type === "IN") {
+        const status = tx.status ?? "CLEARED";
+        if (status === "PENDING") {
+          pendingCapital += tx.amount;
+          continue;
+        }
+
         totalIn += tx.amount;
         totalTax += tx.taxAmount;
         if (!tx.taxCleared) {
@@ -57,6 +67,7 @@ export const getDashboardStats = query({
     return {
       safeToSpend,
       taxHostage,
+      pendingCapital,
       totalBleed: totalOut,
       recentTransactions,
     };
@@ -77,7 +88,7 @@ export const markTaxesPaid = mutation({
   handler: async (ctx) => {
     const incomeTransactions = await ctx.db
       .query("transactions")
-      .filter((q) => q.eq(q.field("type"), "IN"))
+      .withIndex("by_type", (q) => q.eq("type", "IN"))
       .collect();
 
     for (const tx of incomeTransactions) {
@@ -85,5 +96,27 @@ export const markTaxesPaid = mutation({
         await ctx.db.patch(tx._id, { taxCleared: true });
       }
     }
+  },
+});
+
+export const clearInvoice = mutation({
+  args: {
+    id: v.id("transactions"),
+  },
+  handler: async (ctx, args) => {
+    const transaction = await ctx.db.get(args.id);
+    if (!transaction) {
+      throw new ConvexError("Transaction not found.");
+    }
+
+    if (transaction.type !== "IN") {
+      throw new ConvexError("Only income transactions can be cleared.");
+    }
+
+    await ctx.db.patch(args.id, {
+      status: "CLEARED",
+      taxAmount: transaction.amount * 0.01,
+      taxCleared: false,
+    });
   },
 });

@@ -7,6 +7,7 @@ export function useFinance() {
   return {
     safeToSpend: stats?.safeToSpend ?? 0,
     taxHostage: stats?.taxHostage ?? 0,
+    pendingCapital: stats?.pendingCapital ?? 0,
     totalBleed: stats?.totalBleed ?? 0,
     recentTransactions: stats?.recentTransactions ?? [],
     isLoading: stats === undefined,
