@@ -159,15 +159,6 @@ export default function PulseTab() {
           </RenderIf>
         </View>
       </View>
-
-      <View className="my-6">
-        <CustomButton
-          variant="secondary"
-          label="New Transaction"
-          onPress={() => setIsSheetOpen(true)}
-        />
-      </View>
-
       <ExpenseList
         data={recentTransactions}
         keyExtractor={(item) => item._id}
@@ -189,6 +180,11 @@ export default function PulseTab() {
         )}
       />
 
+        <CustomButton
+          variant="secondary"
+          label="New Transaction"
+          onPress={() => setIsSheetOpen(true)}
+        />
       <TransactionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
       <DeleteTransactionDialog

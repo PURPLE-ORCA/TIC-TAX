@@ -143,13 +143,6 @@ export default function SandboxScreen() {
           keyExtractor={(item) => item.id}
           title="The Regret List"
           badge={`${cart.length} ITEMS`}
-          ListEmptyComponent={
-            <View className="py-20 items-center">
-              <Text variant="small" className="text-foreground/20">
-                Zero Regrets Detected
-              </Text>
-            </View>
-          }
           renderItem={renderCartItem}
         />
       </View>

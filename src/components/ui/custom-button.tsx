@@ -1,5 +1,5 @@
 import { Button } from 'heroui-native';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { tv, type VariantProps } from 'tailwind-variants';
 
 const button = tv({
@@ -40,14 +40,14 @@ export type CustomButtonProps = {
 
 export function CustomButton({ variant = "primary", className, label, onPress, isDisabled }: CustomButtonProps) {
   return (
-    <Button 
-      className={button({ variant, className })} 
-      onPress={onPress}
-      isDisabled={isDisabled}
-    >
-      {label && (
-        <Text className={labelText({ variant })}>{label}</Text>
-      )}
-    </Button>
+    <View className="my-6">
+      <Button
+        className={button({ variant, className })}
+        onPress={onPress}
+        isDisabled={isDisabled}
+      >
+        {label && <Text className={labelText({ variant })}>{label}</Text>}
+      </Button>
+    </View>
   );
 }

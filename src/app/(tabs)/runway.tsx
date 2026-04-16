@@ -155,13 +155,11 @@ export default function RunwayScreen() {
       </View>
 
       {/* Bottom Section: Action */}
-      <View>
         <CustomButton
           variant="secondary"
           label="New Bleeding"
           onPress={() => setIsSheetOpen(true)}
         />
-      </View>
 
       <SubscriptionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
