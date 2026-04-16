@@ -62,7 +62,8 @@ export default function PulseTab() {
 
   const getTransactionTone = (tx: RecentTransaction) => {
     if (tx.type !== "IN") return "text-foreground/40";
-    return tx.status === "PENDING" ? "text-yellow-500" : "text-green-500";
+    if (tx.status === "PENDING") return "text-yellow-500";
+    return "text-green-500";
   };
 
   const getTransactionAmount = (tx: RecentTransaction) =>
