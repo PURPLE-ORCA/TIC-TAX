@@ -10,7 +10,7 @@ export interface BackButtonProps {
 }
 
 // ChevronLeft from Ionicons - type assertion needed due to TS strict literal types
-const BACK_ICON_NAME = "chevron-left" as unknown as IconName;
+const BACK_ICON_NAME = "chevron-back-sharp" as unknown as IconName;
 
 export function BackButton({
   onPress,
@@ -26,7 +26,7 @@ export function BackButton({
         onPress={onPress}
         className={className}
       >
-        <Icon name={BACK_ICON_NAME} size={20} />
+        <Icon name={BACK_ICON_NAME} size={20} color="white"/>
       </Button>
     </View>
   );
