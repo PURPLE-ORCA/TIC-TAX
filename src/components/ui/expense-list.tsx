@@ -24,7 +24,7 @@ export function ExpenseList<T>({
   renderItem,
 }: ExpenseListProps<T>) {
   return (
-    <View className="flex-1">
+    <View className="flex-1 py-4">
       <RenderIf condition={!!title}>
         <View className="flex-row items-center justify-between mb-2">
           <Text variant="smallBold">{title}</Text>
@@ -42,7 +42,7 @@ export function ExpenseList<T>({
         scrollEnabled={scrollEnabled}
         ListEmptyComponent={
           <RenderIf condition={!isLoading}>
-            <View className="py-20 items-center">
+            <View className="py-40 items-center">
               <Text variant="small" className="text-foreground/20">
                 No Items Yet
               </Text>

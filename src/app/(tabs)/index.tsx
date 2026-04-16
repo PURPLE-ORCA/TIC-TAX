@@ -1,26 +1,33 @@
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
-import { DeleteTransactionDialog } from "@/src/components/screens/home/DeleteTransactionDialog";
-import { ClearInvoiceDialog } from "@/src/components/screens/home/ClearInvoiceDialog";
-import { PayTaxesDialog } from "@/src/components/screens/home/PayTaxesDialog";
-import { ExpenseList } from "@/src/components/ui/expense-list";
-import { RenderIf } from "@/src/components/helpers/render-if";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
 import { formatCurrency } from "@/src/components/lib/format-currency";
+import { ClearInvoiceDialog } from "@/src/components/screens/home/ClearInvoiceDialog";
+import { DeleteTransactionDialog } from "@/src/components/screens/home/DeleteTransactionDialog";
+import { FinanceSummary } from "@/src/components/screens/home/FinanceSummary";
+import { PayTaxesDialog } from "@/src/components/screens/home/PayTaxesDialog";
 import { CustomButton } from "@/src/components/ui/custom-button";
+import { ExpenseList } from "@/src/components/ui/expense-list";
 import { Text } from "@/src/components/ui/text";
 import { useMutation } from "convex/react";
-import { Card } from "heroui-native";
 import { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 export default function PulseTab() {
-  const { safeToSpend, taxHostage, pendingCapital, recentTransactions, isLoading } = useFinance();
+  const {
+    safeToSpend,
+    taxHostage,
+    pendingCapital,
+    recentTransactions,
+    isLoading,
+  } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [pendingDeleteId, setPendingDeleteId] = useState<Id<"transactions"> | null>(null);
-  const [pendingClearId, setPendingClearId] = useState<Id<"transactions"> | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] =
+    useState<Id<"transactions"> | null>(null);
+  const [pendingClearId, setPendingClearId] =
+    useState<Id<"transactions"> | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
   const [isTaxesDialogOpen, setIsTaxesDialogOpen] = useState(false);
@@ -116,49 +123,15 @@ export default function PulseTab() {
 
   return (
     <SafeScreen safeArea="both">
-      <View>
-        <View className="gap-4">
-          <Card variant="transparent" className="p-6 border rounded-xl">
-            <Text variant="smallBold" className="text-foreground/40 mb-1">
-              Safe to Spend
-            </Text>
-            <Text variant="subtitle">
-              {isLoading ? "..." : formatCurrency(safeToSpend)}
-            </Text>
-          </Card>
-
-          <TouchableOpacity
-            onLongPress={() => setIsTaxesDialogOpen(true)}
-            delayLongPress={300}
-          >
-            <Card
-              variant="transparent"
-              className="p-4 rounded-xl border border-red-500/20 bg-red-500/5"
-            >
-              <Text variant="smallBold" className="text-red-500/60 mb-1">
-                Tax Hostage
-              </Text>
-              <Text variant="large" className="text-red-500">
-                {isLoading ? "..." : formatCurrency(taxHostage)}
-              </Text>
-            </Card>
-          </TouchableOpacity>
-
-          <RenderIf condition={pendingCapital > 0}>
-            <Card
-              variant="transparent"
-              className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5"
-            >
-              <Text variant="smallBold" className="text-yellow-500/70 mb-1">
-                Awaiting Client Payment
-              </Text>
-              <Text variant="large" className="text-yellow-500">
-                {isLoading ? "..." : formatCurrency(pendingCapital)}
-              </Text>
-            </Card>
-          </RenderIf>
-        </View>
-      </View>
+      {/* Finance Summary */}
+      <FinanceSummary
+        safeToSpend={safeToSpend}
+        taxHostage={taxHostage}
+        pendingCapital={pendingCapital}
+        isLoading={isLoading}
+        onTaxHostageLongPress={() => setIsTaxesDialogOpen(true)}
+      />
+      
       <ExpenseList
         data={recentTransactions}
         keyExtractor={(item) => item._id}
@@ -173,18 +146,18 @@ export default function PulseTab() {
             <Text variant={tx.note ? "default" : "small"}>
               {tx.note || tx.category}
             </Text>
-            <Text variant="smallBold" className={getTransactionTone(tx)}>
+            <Text variant="xs" className={getTransactionTone(tx)}>
               {formatCurrency(getTransactionAmount(tx))}
             </Text>
           </TouchableOpacity>
         )}
       />
 
-        <CustomButton
-          variant="secondary"
-          label="New Transaction"
-          onPress={() => setIsSheetOpen(true)}
-        />
+      <CustomButton
+        variant="secondary"
+        label="New Transaction"
+        onPress={() => setIsSheetOpen(true)}
+      />
       <TransactionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
       <DeleteTransactionDialog

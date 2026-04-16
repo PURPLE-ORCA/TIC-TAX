@@ -1,16 +1,16 @@
-import { api } from '@/convex/_generated/api';
-import { SafeScreen } from '@/src/components/layout/SafeScreen';
-import { ExpenseList } from '@/src/components/ui/expense-list';
-import { CustomButton } from '@/src/components/ui/custom-button';
-import { Text } from '@/src/components/ui/text';
-import { useFinance } from '@/src/components/hooks/useFinance';
-import { formatCurrency } from '@/src/components/lib/format-currency';
-import { useMutation } from 'convex/react';
-import { useRouter } from 'expo-router';
-import { Button, Input, Label, TextField } from 'heroui-native';
-import { Skull, X, Zap } from 'lucide-react-native';
-import React, { useMemo, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { api } from "@/convex/_generated/api";
+import { useFinance } from "@/src/components/hooks/useFinance";
+import { SafeScreen } from "@/src/components/layout/SafeScreen";
+import { formatCurrency } from "@/src/components/lib/format-currency";
+import { OpportunityCost } from "@/src/components/screens/sandbox/OpportunityCost";
+import { SandboxInput } from "@/src/components/screens/sandbox/SandboxInput";
+import { BackButton } from "@/src/components/ui/back-button";
+import { ExpenseList } from "@/src/components/ui/expense-list";
+import { Text } from "@/src/components/ui/text";
+import { useMutation } from "convex/react";
+import { useRouter } from "expo-router";
+import React, { useMemo, useState } from "react";
+import { TouchableOpacity, View } from "react-native";
 
 type SandboxItem = {
   id: string;
@@ -24,15 +24,30 @@ export default function SandboxScreen() {
   const logTransaction = useMutation(api.transactions.logTransaction);
 
   const [cart, setCart] = useState<SandboxItem[]>([]);
-  const [itemName, setItemName] = useState('');
-  const [itemCost, setItemCost] = useState('');
+  const [itemName, setItemName] = useState("");
+  const [itemCost, setItemCost] = useState("");
   const [isExecuting, setIsExecuting] = useState(false);
 
-  const totalCartCost = useMemo(() => cart.reduce((sum, item) => sum + item.cost, 0), [cart]);
-  const remainingCapital = useMemo(() => safeToSpend - totalCartCost, [safeToSpend, totalCartCost]);
-  const originalRunway = useMemo(() => totalBleed > 0 ? safeToSpend / totalBleed : 0, [safeToSpend, totalBleed]);
-  const newRunway = useMemo(() => totalBleed > 0 ? remainingCapital / totalBleed : 0, [remainingCapital, totalBleed]);
-  const runwayLostDays = useMemo(() => (originalRunway - newRunway) * 30, [originalRunway, newRunway]);
+  const totalCartCost = useMemo(
+    () => cart.reduce((sum, item) => sum + item.cost, 0),
+    [cart],
+  );
+  const remainingCapital = useMemo(
+    () => safeToSpend - totalCartCost,
+    [safeToSpend, totalCartCost],
+  );
+  const originalRunway = useMemo(
+    () => (totalBleed > 0 ? safeToSpend / totalBleed : 0),
+    [safeToSpend, totalBleed],
+  );
+  const newRunway = useMemo(
+    () => (totalBleed > 0 ? remainingCapital / totalBleed : 0),
+    [remainingCapital, totalBleed],
+  );
+  const runwayLostDays = useMemo(
+    () => (originalRunway - newRunway) * 30,
+    [originalRunway, newRunway],
+  );
   const hustleRequired = useMemo(() => totalCartCost / 0.99, [totalCartCost]);
 
   const addToSandbox = () => {
@@ -47,8 +62,8 @@ export default function SandboxScreen() {
     };
 
     setCart((prev) => [...prev, nextItem]);
-    setItemName('');
-    setItemCost('');
+    setItemName("");
+    setItemCost("");
   };
 
   const removeFromSandbox = (id: string) => {
@@ -63,16 +78,16 @@ export default function SandboxScreen() {
       await Promise.all(
         cart.map((item) =>
           logTransaction({
-            type: 'OUT',
+            type: "OUT",
             amount: item.cost,
-            category: 'Sandbox',
+            category: "Sandbox",
             note: item.name,
           }),
         ),
       );
       router.back();
     } catch (error) {
-      console.error('Failed to execute sandbox trade:', error);
+      console.error("Failed to execute sandbox trade:", error);
     } finally {
       setIsExecuting(false);
     }
@@ -98,94 +113,35 @@ export default function SandboxScreen() {
   return (
     <SafeScreen safeArea="both">
       {/* Header */}
-      <View className="flex-row items-center justify-between">
-        <Button 
-          variant="tertiary" 
-          size="sm" 
-          onPress={() => router.back()}
-        >
-          <X size={20} color="#a1a1aa" />
-        </Button>
-      </View>
-
+      <BackButton onPress={() => router.back()} />
+        
       {/* Impact Section: The Opportunity Cost */}
-      <View className="items-center py-4 gap-2">
-        <View className="flex-row items-center gap-2 mb-2">
-          <Skull size={14} color="#ef4444" />
-          <Text variant="small" className="text-red-500 font-bold">
-            OPPORTUNITY COST
-          </Text>
-        </View>
-
-        <View className="items-center">
-          <Text
-          variant='title'
-            className="text-red-500 font-bold"
-          >
-            -{Math.max(0, runwayLostDays).toFixed(0)}
-          </Text>
-          <Text variant="smallBold" className="text-red-500/60 uppercase tracking-widest">
-            Days of Survival Lost
-          </Text>
-        </View>
-
-        <View className="mt-2 px-6 py-2 rounded-2xl bg-foreground/5 items-center">
-          <Text variant="xs" className="text-center">
-            Requires {formatCurrency(Math.max(0, hustleRequired)).replace('+ ', '')} in new invoices to offset
-          </Text>
-        </View>
-      </View>
+      <OpportunityCost
+        runwayLostDays={runwayLostDays}
+        hustleRequired={hustleRequired}
+        formatCurrency={formatCurrency}
+      />
 
       {/* Middle Section: The Regret List */}
-      <View className="flex-1 mt-6">
-        <ExpenseList
-          data={cart}
-          keyExtractor={(item) => item.id}
-          title="The Regret List"
-          badge={`${cart.length} ITEMS`}
-          renderItem={renderCartItem}
-        />
-      </View>
+      <ExpenseList
+        data={cart}
+        keyExtractor={(item) => item.id}
+        title="The Regret List"
+        badge={`${cart.length} ITEMS`}
+        renderItem={renderCartItem}
+      />
 
-      {/* Bottom Section: Input & Action */}
-      <View className="gap-4 pt-6">
-        <View className="flex-row gap-3">
-          <View className="flex-1">
-            <TextField>
-              <Label>Item</Label>
-              <Input
-                placeholder="New headset"
-                value={itemName}
-                onChangeText={setItemName}
-              />
-            </TextField>
-          </View>
-          <View className="flex-1">
-            <TextField>
-              <Label>Cost </Label>
-              <Input
-                placeholder="499"
-                value={itemCost}
-                onChangeText={setItemCost}
-                keyboardType="decimal-pad"
-              />
-            </TextField>
-          </View>
-        </View>
-
-        <CustomButton
-          variant="secondary"
-          label="Add to Sandbox"
-          onPress={addToSandbox}
-        />
-
-        <CustomButton
-          variant="primary"
-          label={isExecuting ? 'Executing...' : 'Execute Trade'}
-          onPress={executeTrade}
-          isDisabled={cart.length === 0 || isExecuting}
-        />
-      </View>
+      {/* Input & Action */}
+      <SandboxInput
+        itemName={itemName}
+        itemCost={itemCost}
+        setItemName={setItemName}
+        setItemCost={setItemCost}
+        onAddToSandbox={addToSandbox}
+        onExecuteTrade={executeTrade}
+        isExecuting={isExecuting}
+        cartLength={cart.length}
+      />
     </SafeScreen>
   );
 }

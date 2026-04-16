@@ -1,16 +1,17 @@
 import { api } from "@/convex/_generated/api";
 import { SubscriptionSheet } from "@/src/components/finance/SubscriptionSheet";
-import { DeleteSubscriptionDialog } from "@/src/components/screens/runway/DeleteSubscriptionDialog";
-import { ExpenseList } from "@/src/components/ui/expense-list";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
 import { formatCurrency } from "@/src/components/lib/format-currency";
 import { formatRunway } from "@/src/components/lib/format-runway";
+import { DeleteSubscriptionDialog } from "@/src/components/screens/runway/DeleteSubscriptionDialog";
+import { SurvivalClock } from "@/src/components/screens/runway/SurvivalClock";
 import { CustomButton } from "@/src/components/ui/custom-button";
+import { ExpenseList } from "@/src/components/ui/expense-list";
 import { Text } from "@/src/components/ui/text";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "expo-router";
-import { Calculator, Flame, Skull } from "lucide-react-native";
+import { Calculator } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
@@ -76,7 +77,7 @@ export default function RunwayScreen() {
         <Text numberOfLines={1}>{item.name}</Text>
       </View>
       <View className="items-end">
-        <Text className="text-primary text-xl">
+        <Text variant="xs">
           {formatCurrency(item.monthlyCost).replace("+ ", "")}
         </Text>
       </View>
@@ -92,74 +93,37 @@ export default function RunwayScreen() {
           accessibilityRole="button"
           accessibilityLabel="Open opportunity cost sandbox"
         >
-          <Calculator size={18} color="#c200fb" />
+          <Calculator size={18} color="white" />
         </TouchableOpacity>
       </View>
 
-      {/* Top Section: The Survival Clock */}
-      <View className="items-center py-2 gap-2">
-        <View className="flex-row items-center gap-2 mb-2">
-          {isCritical ? (
-            <Skull size={14} color="#ef4444" />
-          ) : (
-            <Flame size={14} color="#22c55e" />
-          )}
-          <Text
-            className={
-              isCritical
-                ? "text-red-500 tracking-widest text-[10px]"
-                : "text-green-500 tracking-widest text-[10px]"
-            }
-          >
-            The Survival Clock
-          </Text>
-        </View>
-
-        <View className="items-center">
-          <Text
-            className={`text-8xl tracking-tighter ${isCritical ? "text-red-500" : "text-foreground"}`}
-          >
-            {formatRunway(runwayMonths)}
-          </Text>
-          <Text>Survival Time</Text>
-        </View>
-
-        <View className="border-primary px-8 py-4 rounded-xl flex-row items-center gap-6 border">
-          <View>
-            <Text variant="small">Monthly Burn</Text>
-            <Text className="text-foreground text-xl">
-              {formatCurrency(monthlyBurn).replace("+ ", "")}
-            </Text>
-          </View>
-          <View className="w-px h-10 bg-primary" />
-          <View>
-            <Text variant="small">Safe Capital</Text>
-            <Text className="text-foreground text-xl">
-              {financeLoading
-                ? "..."
-                : formatCurrency(safeToSpend).replace("+ ", "")}
-            </Text>
-          </View>
-        </View>
-      </View>
+      {/* Survival Clock */}
+      <SurvivalClock
+        runwayMonths={runwayMonths}
+        monthlyBurn={monthlyBurn}
+        safeToSpend={safeToSpend}
+        financeLoading={financeLoading}
+        isCritical={isCritical}
+        formatRunway={formatRunway}
+        formatCurrency={formatCurrency}
+      />
 
       {/* Middle Section: The SaaS Bleed */}
-      <View className="flex-1 mt-6">
-        <ExpenseList
-          data={subscriptions}
-          keyExtractor={(item) => item._id}
-          title="Continuous Bleed"
-          badge={`${subscriptions.length} ACTIVE`}
-          renderItem={renderSubscription}
-        />
-      </View>
+
+      <ExpenseList
+        data={subscriptions}
+        keyExtractor={(item) => item._id}
+        title="Continuous Bleed"
+        badge={`${subscriptions.length} ACTIVE`}
+        renderItem={renderSubscription}
+      />
 
       {/* Bottom Section: Action */}
-        <CustomButton
-          variant="secondary"
-          label="New Bleeding"
-          onPress={() => setIsSheetOpen(true)}
-        />
+      <CustomButton
+        variant="secondary"
+        label="New Bleeding"
+        onPress={() => setIsSheetOpen(true)}
+      />
 
       <SubscriptionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
