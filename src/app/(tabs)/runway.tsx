@@ -1,5 +1,6 @@
 import { api } from "@/convex/_generated/api";
 import { SubscriptionSheet } from "@/src/components/finance/SubscriptionSheet";
+import { ExpenseList } from "@/src/components/ui/expense-list";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
 import { formatCurrency } from "@/src/components/lib/format-currency";
@@ -11,7 +12,7 @@ import { useRouter } from "expo-router";
 import { Button, Dialog } from "heroui-native";
 import { Calculator, Flame, Skull } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 export default function RunwayScreen() {
   const router = useRouter();
@@ -153,16 +154,11 @@ export default function RunwayScreen() {
           </View>
         </View>
 
-        <FlatList
+        <ExpenseList
           data={subscriptions}
-          renderItem={renderSubscription}
           keyExtractor={(item) => item._id}
           scrollEnabled={false}
-          ListEmptyComponent={
-            <View className="py-20 items-center opacity-20 border border-dashed border-white/10 rounded-3xl">
-              <Text variant="small">Zero Parasites Detected</Text>
-            </View>
-          }
+          renderItem={renderSubscription}
         />
       </View>
 

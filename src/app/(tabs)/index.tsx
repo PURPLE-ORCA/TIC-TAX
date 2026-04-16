@@ -4,6 +4,7 @@ import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
 import { DeleteTransactionDialog } from "@/src/components/screens/home/DeleteTransactionDialog";
 import { ClearInvoiceDialog } from "@/src/components/screens/home/ClearInvoiceDialog";
 import { PayTaxesDialog } from "@/src/components/screens/home/PayTaxesDialog";
+import { ExpenseList } from "@/src/components/ui/expense-list";
 import { RenderIf } from "@/src/components/helpers/render-if";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
@@ -13,7 +14,7 @@ import { Text } from "@/src/components/ui/text";
 import { useMutation } from "convex/react";
 import { Card } from "heroui-native";
 import { useState } from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 export default function PulseTab() {
   const { safeToSpend, taxHostage, pendingCapital, recentTransactions, isLoading } = useFinance();
@@ -167,36 +168,26 @@ export default function PulseTab() {
         />
       </View>
 
-      <View className="flex-1">
-        <Text variant="smallBold" className="mb-2">
-          Recent Activity
-        </Text>
-
-        <FlatList
-          data={recentTransactions}
-          keyExtractor={(item) => item._id}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <RenderIf condition={!isLoading}>
-              <Text>No transactions yet.</Text>
-            </RenderIf>
-          }
-          renderItem={({ item: tx }) => (
-            <TouchableOpacity
-              className="flex-row justify-between py-2 border-b border-foreground/5"
-              onLongPress={() => handleTransactionLongPress(tx)}
-              delayLongPress={300}
-            >
-              <Text variant={tx.note ? "default" : "small"}>
-                {tx.note || tx.category}
-              </Text>
-              <Text variant="smallBold" className={getTransactionTone(tx)}>
-                {formatCurrency(getTransactionAmount(tx))}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+      <ExpenseList
+        data={recentTransactions}
+        keyExtractor={(item) => item._id}
+        title="Recent Activity"
+        isLoading={isLoading}
+        renderItem={({ item: tx }) => (
+          <TouchableOpacity
+            className="flex-row justify-between py-2 border-b border-foreground/5"
+            onLongPress={() => handleTransactionLongPress(tx)}
+            delayLongPress={300}
+          >
+            <Text variant={tx.note ? "default" : "small"}>
+              {tx.note || tx.category}
+            </Text>
+            <Text variant="smallBold" className={getTransactionTone(tx)}>
+              {formatCurrency(getTransactionAmount(tx))}
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
 
       <TransactionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
