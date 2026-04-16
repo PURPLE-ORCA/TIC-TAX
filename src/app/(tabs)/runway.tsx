@@ -1,5 +1,6 @@
 import { api } from "@/convex/_generated/api";
 import { SubscriptionSheet } from "@/src/components/finance/SubscriptionSheet";
+import { DeleteSubscriptionDialog } from "@/src/components/screens/runway/DeleteSubscriptionDialog";
 import { ExpenseList } from "@/src/components/ui/expense-list";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
@@ -9,7 +10,6 @@ import { CustomButton } from "@/src/components/ui/custom-button";
 import { Text } from "@/src/components/ui/text";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "expo-router";
-import { Button, Dialog } from "heroui-native";
 import { Calculator, Flame, Skull } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -146,18 +146,13 @@ export default function RunwayScreen() {
       {/* Middle Section: The SaaS Bleed */}
       <View className="flex-1 mt-6">
         <View className="flex-row justify-between items-center mb-6">
-          <Text variant="smallBold">The SaaS Bleed</Text>
-          <View className="bg-primary/10 px-2 py-0.5 rounded-md">
-            <Text variant="xs" className="text-primary">
-              {subscriptions.length} ACTIVE
-            </Text>
-          </View>
+
         </View>
 
         <ExpenseList
           data={subscriptions}
           keyExtractor={(item) => item._id}
-          scrollEnabled={false}
+          title="Continuous Bleed"
           renderItem={renderSubscription}
         />
       </View>
@@ -173,42 +168,12 @@ export default function RunwayScreen() {
 
       <SubscriptionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
-      <Dialog
+      <DeleteSubscriptionDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={handleDeleteDialogChange}
-      >
-        <Dialog.Portal>
-          <Dialog.Overlay className="bg-black/60" />
-          <Dialog.Content className="mx-6 rounded-2xl border border-foreground/10 bg-background p-6">
-            <Dialog.Close variant="ghost" />
-            <View className="mb-6 gap-1.5">
-              <Dialog.Title>Kill Subscription?</Dialog.Title>
-              <Dialog.Description>
-                Remove this from monthly burn rate?
-              </Dialog.Description>
-            </View>
-            <View className="flex-row justify-end gap-3">
-              <Button
-                variant="tertiary"
-                size="sm"
-                onPress={() => handleDeleteDialogChange(false)}
-              >
-                <Button.Label>Cancel</Button.Label>
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onPress={confirmDeleteSubscription}
-                isDisabled={isDeleting}
-              >
-                <Button.Label>
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </Button.Label>
-              </Button>
-            </View>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog>
+        onConfirm={confirmDeleteSubscription}
+        isLoading={isDeleting}
+      />
     </SafeScreen>
   );
 }
