@@ -1,5 +1,6 @@
 import { api } from '@/convex/_generated/api';
 import { SafeScreen } from '@/src/components/layout/SafeScreen';
+import { ExpenseList } from '@/src/components/ui/expense-list';
 import { CustomButton } from '@/src/components/ui/custom-button';
 import { Text } from '@/src/components/ui/text';
 import { useFinance } from '@/src/components/hooks/useFinance';
@@ -9,7 +10,7 @@ import { useRouter } from 'expo-router';
 import { Button, Input, Label, TextField } from 'heroui-native';
 import { Skull, X, Zap } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
 type SandboxItem = {
   id: string;
@@ -137,22 +138,11 @@ export default function SandboxScreen() {
 
       {/* Middle Section: The Regret List */}
       <View className="flex-1 mt-6">
-        <View className="flex-row justify-between items-center mb-4">
-          <Text variant="smallBold">
-            The Regret List
-          </Text>
-          <View className="bg-red-500/10 px-2 py-0.5 rounded-md">
-            <Text variant="xs" className="text-red-500">
-              {cart.length} ITEMS
-            </Text>
-          </View>
-        </View>
-
-        <FlatList
+        <ExpenseList
           data={cart}
-          renderItem={renderCartItem}
           keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
+          title="The Regret List"
+          badge={`${cart.length} ITEMS`}
           ListEmptyComponent={
             <View className="py-20 items-center">
               <Text variant="small" className="text-foreground/20">
@@ -160,6 +150,7 @@ export default function SandboxScreen() {
               </Text>
             </View>
           }
+          renderItem={renderCartItem}
         />
       </View>
 
