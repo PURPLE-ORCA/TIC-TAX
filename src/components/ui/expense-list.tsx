@@ -1,5 +1,6 @@
 import type React from "react";
 import { FlatList, View } from "react-native";
+import { Chip } from "heroui-native";
 import { Text } from "@/src/components/ui/text";
 import { RenderIf } from "@/src/components/helpers/render-if";
 
@@ -7,6 +8,7 @@ interface ExpenseListProps<T> {
   data: readonly T[];
   keyExtractor: (item: T) => string;
   title?: string;
+  badge?: React.ReactNode;
   isLoading?: boolean;
   scrollEnabled?: boolean;
   ListEmptyComponent?: React.ReactNode;
@@ -17,6 +19,7 @@ export function ExpenseList<T>({
   data,
   keyExtractor,
   title,
+  badge,
   isLoading,
   scrollEnabled = true,
   ListEmptyComponent,
@@ -25,9 +28,14 @@ export function ExpenseList<T>({
   return (
     <View className="flex-1">
       <RenderIf condition={!!title}>
-        <Text variant="smallBold" className="mb-2">
-          {title}
-        </Text>
+        <View className="flex-row items-center justify-between mb-2">
+          <Text variant="smallBold">{title}</Text>
+          <RenderIf condition={!!badge}>
+            <Chip variant="soft" size="sm">
+              <Chip.Label>{badge}</Chip.Label>
+            </Chip>
+          </RenderIf>
+        </View>
       </RenderIf>
       <FlatList
         data={data}

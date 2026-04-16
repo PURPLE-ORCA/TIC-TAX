@@ -145,14 +145,11 @@ export default function RunwayScreen() {
 
       {/* Middle Section: The SaaS Bleed */}
       <View className="flex-1 mt-6">
-        <View className="flex-row justify-between items-center mb-6">
-
-        </View>
-
         <ExpenseList
           data={subscriptions}
           keyExtractor={(item) => item._id}
           title="Continuous Bleed"
+          badge={`${subscriptions.length} ACTIVE`}
           renderItem={renderSubscription}
         />
       </View>
