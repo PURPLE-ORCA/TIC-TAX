@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { 
   BottomSheet,
   Button, 
-  Input, 
   Label, 
   TextField,
 } from 'heroui-native';
@@ -62,21 +62,27 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
             {/* Name Input */}
             <TextField>
               <Label>Service Name</Label>
-              <Input
+              <BottomSheetTextInput
                 placeholder="e.g. ChatGPT"
                 value={name}
                 onChangeText={setName}
+                selectionColor="#f8fafc"
+                placeholderTextColor="#94a3b8"
+                style={styles.input}
               />
             </TextField>
 
             {/* Monthly Cost Input */}
             <TextField>
               <Label>Monthly Cost (MAD)</Label>
-              <Input
+              <BottomSheetTextInput
                 placeholder="0.00"
                 value={monthlyCost}
                 onChangeText={setMonthlyCost}
                 keyboardType="decimal-pad"
+                selectionColor="#f8fafc"
+                placeholderTextColor="#94a3b8"
+                style={styles.input}
               />
             </TextField>
 
@@ -101,3 +107,17 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
     </BottomSheet>
   );
 }
+
+const styles = StyleSheet.create({
+  input: {
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    color: '#f8fafc',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderRadius: 12,
+  },
+});

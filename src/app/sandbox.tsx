@@ -98,7 +98,6 @@ export default function SandboxScreen() {
     <SafeScreen safeArea="both">
       {/* Header */}
       <View className="flex-row items-center justify-between">
-        <Text variant="title">Sandbox</Text>
         <Button 
           variant="tertiary" 
           size="sm" 

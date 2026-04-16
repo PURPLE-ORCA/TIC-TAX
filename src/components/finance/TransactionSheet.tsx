@@ -2,12 +2,12 @@ import { api } from "@/convex/_generated/api";
 import { RenderIf } from "@/src/components/helpers/render-if";
 import { Show } from "@/src/components/helpers/show";
 import { Text } from "@/src/components/ui/text";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useMutation } from "convex/react";
 import {
   BottomSheet,
   Button,
   Chip,
-  Input,
   Label,
   Tabs,
   TextField,
@@ -15,7 +15,7 @@ import {
 } from "heroui-native";
 import { Check } from "lucide-react-native";
 import React, { useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 interface TransactionSheetProps {
   isOpen: boolean;
@@ -162,24 +162,27 @@ export function TransactionSheet({
             {/* Amount Input */}
             <TextField>
               <Label>Amount</Label>
-              <Input
+              <BottomSheetTextInput
                 placeholder="0.00"
                 value={amount}
                 onChangeText={setAmount}
                 keyboardType="decimal-pad"
-                selectionColorClassName="accent-primary"
-                autoFocus
+                selectionColor="#f8fafc"
+                placeholderTextColor="#94a3b8"
+                style={styles.input}
               />
             </TextField>
 
             {/* Note Input */}
             <TextField>
               <Label>Note</Label>
-              <Input
+              <BottomSheetTextInput
                 placeholder="Optional note (Client, reason, etc.)"
                 value={note}
                 onChangeText={setNote}
-                selectionColorClassName="accent-primary"
+                selectionColor="#f8fafc"
+                placeholderTextColor="#94a3b8"
+                style={styles.input}
               />
             </TextField>
 
@@ -243,3 +246,17 @@ export function TransactionSheet({
     </BottomSheet>
   );
 }
+
+const styles = StyleSheet.create({
+  input: {
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "rgba(255,255,255,0.04)",
+    color: "#f8fafc",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderRadius: 12,
+  },
+});
