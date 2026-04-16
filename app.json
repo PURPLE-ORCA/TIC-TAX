@@ -7,6 +7,7 @@
     "icon": "./src/assets/images/icon.png",
     "scheme": "tictax",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#00120B",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -27,6 +28,14 @@
       "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": false,
+          "barStyle": "light",
+          "visibility": "visible"
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",

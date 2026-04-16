@@ -38,15 +38,15 @@ export default function RootLayout() {
     Uniwind.setTheme("dark");
 
     if (Platform.OS === "android") {
-      void NavigationBar.setBackgroundColorAsync("#000000");
-      void NavigationBar.setButtonStyleAsync("light");
+      NavigationBar.setStyle("dark");
+      void NavigationBar.setVisibilityAsync("visible");
     }
   }, []);
 
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView className="flex-1">
-        <KeyboardProvider>
+        <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
           <HeroUINativeProvider>
             <ConvexAuthProvider client={convex} storage={secureStorage}>
               <Stack screenOptions={{ headerShown: false }}>

@@ -1,7 +1,12 @@
 import { Tabs } from "expo-router";
 import { Activity, PlaneTakeoff } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
+  const { bottom } = useSafeAreaInsets();
+  const tabBarPaddingBottom = Math.max(bottom, 12);
+  const tabBarHeight = 62 + tabBarPaddingBottom;
+
   return (
     <Tabs
       screenOptions={{
@@ -9,8 +14,8 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: '#00120B',
           borderTopColor: 'rgba(255,255,255,0.05)',
-          height: 90,
-          paddingBottom: 35,
+          height: tabBarHeight,
+          paddingBottom: tabBarPaddingBottom,
           paddingTop: 10,
           elevation: 0,
           shadowOpacity: 0,
