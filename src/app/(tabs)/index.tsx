@@ -1,6 +1,9 @@
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
+import { DeleteTransactionDialog } from "@/src/components/screens/home/DeleteTransactionDialog";
+import { ClearInvoiceDialog } from "@/src/components/screens/home/ClearInvoiceDialog";
+import { PayTaxesDialog } from "@/src/components/screens/home/PayTaxesDialog";
 import { RenderIf } from "@/src/components/helpers/render-if";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
@@ -8,17 +11,15 @@ import { formatCurrency } from "@/src/components/lib/format-currency";
 import { CustomButton } from "@/src/components/ui/custom-button";
 import { Text } from "@/src/components/ui/text";
 import { useMutation } from "convex/react";
-import { Button, Card, Dialog } from "heroui-native";
-import React, { useState } from "react";
+import { Card } from "heroui-native";
+import { useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 export default function PulseTab() {
   const { safeToSpend, taxHostage, pendingCapital, recentTransactions, isLoading } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [pendingDeleteId, setPendingDeleteId] =
-    useState<Id<"transactions"> | null>(null);
-  const [pendingClearId, setPendingClearId] =
-    useState<Id<"transactions"> | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<Id<"transactions"> | null>(null);
+  const [pendingClearId, setPendingClearId] = useState<Id<"transactions"> | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
   const [isTaxesDialogOpen, setIsTaxesDialogOpen] = useState(false);
@@ -28,6 +29,7 @@ export default function PulseTab() {
   const deleteTransaction = useMutation(api.transactions.deleteTransaction);
   const clearInvoice = useMutation(api.transactions.clearInvoice);
   const markTaxesPaid = useMutation(api.transactions.markTaxesPaid);
+  type RecentTransaction = (typeof recentTransactions)[number];
 
   const openDeleteDialog = (id: Id<"transactions">) => {
     setPendingDeleteId(id);
@@ -48,6 +50,23 @@ export default function PulseTab() {
     setIsClearDialogOpen(open);
     if (!open) setPendingClearId(null);
   };
+
+  const handleTransactionLongPress = (tx: RecentTransaction) => {
+    if (tx.type === "IN" && tx.status === "PENDING") {
+      openClearDialog(tx._id);
+      return;
+    }
+
+    openDeleteDialog(tx._id);
+  };
+
+  const getTransactionTone = (tx: RecentTransaction) => {
+    if (tx.type !== "IN") return "text-foreground/40";
+    return tx.status === "PENDING" ? "text-yellow-500" : "text-green-500";
+  };
+
+  const getTransactionAmount = (tx: RecentTransaction) =>
+    tx.type === "IN" ? tx.amount : -tx.amount;
 
   const confirmDeleteTransaction = async () => {
     if (!pendingDeleteId || isDeleting) return;
@@ -95,7 +114,6 @@ export default function PulseTab() {
 
   return (
     <SafeScreen safeArea="both">
-      {/* Header */}
       <View>
         <View className="gap-4">
           <Card variant="transparent" className="p-6 border rounded-xl">
@@ -140,7 +158,6 @@ export default function PulseTab() {
         </View>
       </View>
 
-      {/* Trigger */}
       <View className="my-6">
         <CustomButton
           variant="secondary"
@@ -149,7 +166,6 @@ export default function PulseTab() {
         />
       </View>
 
-      {/* Recent Transactions List */}
       <View className="flex-1">
         <Text variant="smallBold" className="mb-2">
           Recent Activity
@@ -167,31 +183,14 @@ export default function PulseTab() {
           renderItem={({ item: tx }) => (
             <TouchableOpacity
               className="flex-row justify-between py-2 border-b border-foreground/5"
-              onLongPress={() => {
-                if (tx.type === "IN" && tx.status === "PENDING") {
-                  openClearDialog(tx._id);
-                  return;
-                }
-                openDeleteDialog(tx._id);
-              }}
+              onLongPress={() => handleTransactionLongPress(tx)}
               delayLongPress={300}
             >
-              <Text
-                variant={tx.note ? "default" : "small"}
-              >
+              <Text variant={tx.note ? "default" : "small"}>
                 {tx.note || tx.category}
               </Text>
-              <Text
-                variant="smallBold"
-                className={
-                  tx.type === "IN"
-                    ? tx.status === "PENDING"
-                      ? "text-yellow-500"
-                      : "text-green-500"
-                    : "text-foreground/40"
-                }
-              >
-                {formatCurrency(tx.type === "IN" ? tx.amount : -tx.amount)}
+              <Text variant="smallBold" className={getTransactionTone(tx)}>
+                {formatCurrency(getTransactionAmount(tx))}
               </Text>
             </TouchableOpacity>
           )}
@@ -200,111 +199,26 @@ export default function PulseTab() {
 
       <TransactionSheet isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
 
-      <Dialog
+      <DeleteTransactionDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={handleDeleteDialogChange}
-      >
-        <Dialog.Portal>
-          <Dialog.Overlay className="bg-black/60" />
-          <Dialog.Content className="mx-6 rounded-2xl border border-foreground/10 bg-background p-6">
-            <Dialog.Close variant="ghost" />
-            <View className="mb-6 gap-1.5">
-              <Dialog.Title>Delete Transaction?</Dialog.Title>
-              <Dialog.Description>
-                This action cannot be undone.
-              </Dialog.Description>
-            </View>
-            <View className="flex-row justify-end gap-3">
-              <Button
-                variant="tertiary"
-                size="sm"
-                onPress={() => handleDeleteDialogChange(false)}
-              >
-                <Button.Label>Cancel</Button.Label>
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onPress={confirmDeleteTransaction}
-                isDisabled={isDeleting}
-              >
-                <Button.Label>
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </Button.Label>
-              </Button>
-            </View>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog>
+        onConfirm={confirmDeleteTransaction}
+        isLoading={isDeleting}
+      />
 
-      <Dialog isOpen={isClearDialogOpen} onOpenChange={handleClearDialogChange}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="bg-black/60" />
-          <Dialog.Content className="mx-6 rounded-2xl border border-foreground/10 bg-background p-6">
-            <Dialog.Close variant="ghost" />
-            <View className="mb-6 gap-1.5">
-              <Dialog.Title>Mark Invoice as Paid?</Dialog.Title>
-              <Dialog.Description>
-                This moves the amount into real capital and applies the 1% tax.
-              </Dialog.Description>
-            </View>
-            <View className="flex-row justify-end gap-3">
-              <Button
-                variant="tertiary"
-                size="sm"
-                onPress={() => handleClearDialogChange(false)}
-              >
-                <Button.Label>Cancel</Button.Label>
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onPress={confirmClearInvoice}
-                isDisabled={isClearingInvoice}
-              >
-                <Button.Label>
-                  {isClearingInvoice ? "Confirming..." : "Confirm"}
-                </Button.Label>
-              </Button>
-            </View>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog>
+      <ClearInvoiceDialog
+        isOpen={isClearDialogOpen}
+        onOpenChange={handleClearDialogChange}
+        onConfirm={confirmClearInvoice}
+        isLoading={isClearingInvoice}
+      />
 
-      <Dialog isOpen={isTaxesDialogOpen} onOpenChange={setIsTaxesDialogOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="bg-black/60" />
-          <Dialog.Content className="mx-6 rounded-2xl border border-foreground/10 bg-background p-6">
-            <Dialog.Close variant="ghost" />
-            <View className="mb-6 gap-1.5">
-              <Dialog.Title>Pay the Piper?</Dialog.Title>
-              <Dialog.Description>
-                Mark all current taxes as paid? This resets hostage counter to 0
-                MAD.
-              </Dialog.Description>
-            </View>
-            <View className="flex-row justify-end gap-3">
-              <Button
-                variant="tertiary"
-                size="sm"
-                onPress={() => setIsTaxesDialogOpen(false)}
-              >
-                <Button.Label>Cancel</Button.Label>
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onPress={confirmMarkTaxesPaid}
-                isDisabled={isPayingTaxes}
-              >
-                <Button.Label>
-                  {isPayingTaxes ? "Confirming..." : "Confirm"}
-                </Button.Label>
-              </Button>
-            </View>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog>
+      <PayTaxesDialog
+        isOpen={isTaxesDialogOpen}
+        onOpenChange={setIsTaxesDialogOpen}
+        onConfirm={confirmMarkTaxesPaid}
+        isLoading={isPayingTaxes}
+      />
     </SafeScreen>
   );
 }
