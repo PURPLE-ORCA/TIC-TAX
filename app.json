@@ -21,7 +21,8 @@
         "monochromeImage": "./src/assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.purpleorca.TICTAX"
     },
     "web": {
       "output": "static",
@@ -56,6 +57,17 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "expo-navigation-bar": {
+        "enforceContrast": false,
+        "barStyle": "light",
+        "visibility": "visible"
+      },
+      "router": {},
+      "eas": {
+        "projectId": "c533aece-1873-4009-8d49-0068bcc04e8d"
+      }
     }
   }
 }

@@ -28,7 +28,7 @@ export default function LoginScreen() {
   return (
     <SafeScreen safeArea="both" contentClassName="justify-center px-6">
       <View className="mb-12 items-center">
-        <View className="bg-primary/10 p-6 rounded-[32px] mb-6">
+        <View className="bg-primary/10 p-6 rounded-xl mb-6">
           <Lock size={48} color="#C200FB" strokeWidth={2} />
         </View>
         <Text variant="title" className="text-foreground text-4xl font-black text-center">
