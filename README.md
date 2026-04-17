@@ -64,14 +64,14 @@ In a new terminal window:
 bun dev
 ```
 
-## 🤝 Contributing
+## Contributing
 
 This app was built for brutal efficiency. If you want to contribute, adhere to the following rules:
 1.  **Keep it native and fast.** No heavy animation libraries if a simple transition will do.
 2.  **No bloated state management.** Convex handles the data layer. We don't need Redux for a 3-screen app.
 3.  **UI is secondary to UX.** If a new feature adds friction to the 3-second data entry loop, it gets rejected.
 
-## 📄 License
+## License
 
 MIT License. Do whatever you want with it, just don't blame me when the Survival Clock hits zero.
 ```
