@@ -43,7 +43,7 @@ You don't need to pay for cloud hosting to use this. You can run the entire back
 
 **1. Clone the repository**
 ```bash
-git clone [https://github.com/PURPLE-ORCA/tic-tax.git](https://github.com/PURPLE-ORCA/tic-tax.git)
+git clone https://github.com/PURPLE-ORCA/TIC-TAX.git
 cd tic-tax
 ```
 
@@ -74,4 +74,3 @@ This app was built for brutal efficiency. If you want to contribute, adhere to t
 ## License
 
 MIT License. Do whatever you want with it, just don't blame me when the Survival Clock hits zero.
-```
