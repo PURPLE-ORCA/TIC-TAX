@@ -3,6 +3,7 @@ import type { Id } from "@/convex/_generated/dataModel";
 import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
+import { PlumGradientBackground } from "@/src/components/ui/PlumGradientBackground";
 import { formatCurrency } from "@/src/components/lib/format-currency";
 import { ClearInvoiceDialog } from "@/src/components/screens/home/ClearInvoiceDialog";
 import { DeleteTransactionDialog } from "@/src/components/screens/home/DeleteTransactionDialog";
@@ -69,9 +70,9 @@ export default function PulseTab() {
   };
 
   const getTransactionTone = (tx: RecentTransaction) => {
-    if (tx.type !== "IN") return "text-foreground/40";
-    if (tx.status === "PENDING") return "text-yellow-500";
-    return "text-green-500";
+    if (tx.type !== "IN") return "text-white/40";
+    if (tx.status === "PENDING") return "text-yellow-400";
+    return "text-emerald-400";
   };
 
   const getTransactionAmount = (tx: RecentTransaction) =>
@@ -122,7 +123,9 @@ export default function PulseTab() {
   };
 
   return (
-    <SafeScreen safeArea="both">
+    <SafeScreen safeArea="both" className="relative overflow-hidden bg-transparent">
+      <PlumGradientBackground />
+      
       {/* Finance Summary */}
       <FinanceSummary
         safeToSpend={safeToSpend}
@@ -139,7 +142,7 @@ export default function PulseTab() {
         isLoading={isLoading}
         renderItem={({ item: tx }) => (
           <TouchableOpacity
-            className="flex-row justify-between py-2 border-b border-foreground/5"
+            className="flex-row justify-between py-2 border-b border-white/5"
             onLongPress={() => handleTransactionLongPress(tx)}
             delayLongPress={300}
           >
