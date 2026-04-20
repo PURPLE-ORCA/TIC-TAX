@@ -1,6 +1,6 @@
 import { LottieLoading } from "@/src/components/animations/LottieLoading";
 import { RenderIf } from "@/src/components/helpers/render-if";
-import { formatCurrency } from "@/src/components/lib/format-currency";
+import { formatCurrencyNoSign } from "@/src/components/lib/format-currency";
 import { PlumCard } from "@/src/components/ui/PlumCard";
 import { Text } from "@/src/components/ui/text";
 import { TouchableOpacity, View } from "react-native";
@@ -31,7 +31,7 @@ export function FinanceSummary({
                 Safe to Spend
               </Text>
               <Text variant="subtitle">
-                {isLoading ? "..." : formatCurrency(safeToSpend)}
+                {isLoading ? "..." : formatCurrencyNoSign(safeToSpend)}
               </Text>
             </View>
               <LottieLoading size={100} />
@@ -49,7 +49,7 @@ export function FinanceSummary({
                 Tax Hostage
               </Text>
               <Text variant="smallBold">
-                {isLoading ? "..." : formatCurrency(taxHostage)}
+                {isLoading ? "..." : formatCurrencyNoSign(taxHostage)}
               </Text>
             </PlumCard>
           </TouchableOpacity>
@@ -61,7 +61,7 @@ export function FinanceSummary({
                   Awaiting Payment
                 </Text>
                 <Text variant="smallBold">
-                  {isLoading ? "..." : formatCurrency(pendingCapital)}
+                  {isLoading ? "..." : formatCurrencyNoSign(pendingCapital)}
                 </Text>
               </PlumCard>
             </View>
