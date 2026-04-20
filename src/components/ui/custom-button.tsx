@@ -7,7 +7,7 @@ const button = tv({
   variants: {
     variant: {
       primary: "bg-plum-night",
-      secondary: "bg-primary/15",
+      secondary: "bg-plum-deep",
       transparent: "bg-transparent border border-foreground/10",
     },
   },
@@ -21,7 +21,7 @@ const labelText = tv({
   variants: {
     variant: {
       primary: 'text-white',
-      secondary: 'text-primary',
+      secondary: 'text-foreground',
       transparent: 'text-primary',
     },
   },
