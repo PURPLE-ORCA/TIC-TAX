@@ -1,3 +1,4 @@
+import { LottieLoading } from "@/src/components/animations/LottieLoading";
 import { RenderIf } from "@/src/components/helpers/render-if";
 import { formatCurrency } from "@/src/components/lib/format-currency";
 import { PlumCard } from "@/src/components/ui/PlumCard";
@@ -24,12 +25,17 @@ export function FinanceSummary({
       <View className="py-4 gap-4">
         {/* Safe to Spend Card */}
         <PlumCard className="p-6">
-          <Text variant="smallBold" className="mb-1">
-            Safe to Spend
-          </Text>
-          <Text variant="subtitle">
-            {isLoading ? "..." : formatCurrency(safeToSpend)}
-          </Text>
+          <View className="flex flex-row justify-between items-center">
+            <View>
+              <Text variant="smallBold" className="mb-1">
+                Safe to Spend
+              </Text>
+              <Text variant="subtitle">
+                {isLoading ? "..." : formatCurrency(safeToSpend)}
+              </Text>
+            </View>
+              <LottieLoading size={100} />
+          </View>
         </PlumCard>
 
         <View className="flex flex-row gap-4">
