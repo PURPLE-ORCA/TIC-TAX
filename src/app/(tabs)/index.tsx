@@ -75,7 +75,7 @@ export default function PulseTab() {
       return { name: "time-outline" as const, color: "#fbbf24" };
     }
     if (tx.type === "IN") {
-      return { name: "arrow-down-outline" as const, color: "#34d399" };
+      return { name: "arrow-down-outline" as const, color: "green" };
     }
     return { name: "arrow-up-outline" as const, color: "red" };
   };
