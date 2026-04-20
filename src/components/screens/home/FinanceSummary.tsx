@@ -1,7 +1,7 @@
 import { RenderIf } from "@/src/components/helpers/render-if";
 import { formatCurrency } from "@/src/components/lib/format-currency";
+import { PlumCard } from "@/src/components/ui/PlumCard";
 import { Text } from "@/src/components/ui/text";
-import { Card } from "heroui-native";
 import { TouchableOpacity, View } from "react-native";
 
 export interface FinanceSummaryProps {
@@ -20,48 +20,47 @@ export function FinanceSummary({
   onTaxHostageLongPress,
 }: FinanceSummaryProps) {
   return (
-    <View>
-      <View className="gap-4">
-        <Card variant="transparent" className="p-6 border rounded-xl">
-          <Text variant="smallBold" className="text-foreground/40 mb-1">
+
+      <View className="py-4 gap-4">
+        {/* Safe to Spend Card */}
+        <PlumCard className="p-6">
+          <Text variant="smallBold" className="mb-1">
             Safe to Spend
           </Text>
           <Text variant="subtitle">
             {isLoading ? "..." : formatCurrency(safeToSpend)}
           </Text>
-        </Card>
+        </PlumCard>
 
-        <TouchableOpacity
-          onLongPress={onTaxHostageLongPress}
-          delayLongPress={300}
-        >
-          <Card
-            variant="transparent"
-            className="p-4 rounded-xl border border-red-500/20 bg-red-500/5"
+        <View className="flex flex-row gap-4">
+          <TouchableOpacity
+            className="flex-1"
+            onLongPress={onTaxHostageLongPress}
+            delayLongPress={300}
           >
-            <Text variant="smallBold" className="text-red-500/60 mb-1">
-              Tax Hostage
-            </Text>
-            <Text variant="large" className="text-red-500">
-              {isLoading ? "..." : formatCurrency(taxHostage)}
-            </Text>
-          </Card>
-        </TouchableOpacity>
+            <PlumCard className="">
+              <Text variant="small" className="mb-1">
+                Tax Hostage
+              </Text>
+              <Text variant="smallBold">
+                {isLoading ? "..." : formatCurrency(taxHostage)}
+              </Text>
+            </PlumCard>
+          </TouchableOpacity>
 
-        <RenderIf condition={pendingCapital > 0}>
-          <Card
-            variant="transparent"
-            className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5"
-          >
-            <Text variant="smallBold" className="text-yellow-500/70 mb-1">
-              Awaiting Client Payment
-            </Text>
-            <Text variant="large" className="text-yellow-500">
-              {isLoading ? "..." : formatCurrency(pendingCapital)}
-            </Text>
-          </Card>
-        </RenderIf>
+          <RenderIf condition={pendingCapital > 0}>
+            <View className="flex-1">
+              <PlumCard className="">
+                <Text variant="small" className="mb-1">
+                  Awaiting Payment
+                </Text>
+                <Text variant="smallBold">
+                  {isLoading ? "..." : formatCurrency(pendingCapital)}
+                </Text>
+              </PlumCard>
+            </View>
+          </RenderIf>
+        </View>
       </View>
-    </View>
   );
 }

@@ -3,18 +3,19 @@ import type { Id } from "@/convex/_generated/dataModel";
 import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
-import { PlumGradientBackground } from "@/src/components/ui/PlumGradientBackground";
 import { formatCurrency } from "@/src/components/lib/format-currency";
 import { ClearInvoiceDialog } from "@/src/components/screens/home/ClearInvoiceDialog";
 import { DeleteTransactionDialog } from "@/src/components/screens/home/DeleteTransactionDialog";
 import { FinanceSummary } from "@/src/components/screens/home/FinanceSummary";
 import { PayTaxesDialog } from "@/src/components/screens/home/PayTaxesDialog";
 import { CustomButton } from "@/src/components/ui/custom-button";
-import { ExpenseList } from "@/src/components/ui/expense-list";
+import { PlumGradientBackground } from "@/src/components/ui/PlumGradientBackground";
 import { Text } from "@/src/components/ui/text";
+import { TimelineItem } from "@/src/components/ui/Timeline";
 import { useMutation } from "convex/react";
+import { Card } from "heroui-native";
 import { useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 
 export default function PulseTab() {
   const {
@@ -67,6 +68,16 @@ export default function PulseTab() {
     }
 
     openDeleteDialog(tx._id);
+  };
+
+  const getTransactionIcon = (tx: RecentTransaction) => {
+    if (tx.type === "IN" && tx.status === "PENDING") {
+      return { name: "time-outline" as const, color: "#fbbf24" };
+    }
+    if (tx.type === "IN") {
+      return { name: "arrow-down-outline" as const, color: "#34d399" };
+    }
+    return { name: "arrow-up-outline" as const, color: "red" };
   };
 
   const getTransactionTone = (tx: RecentTransaction) => {
@@ -123,9 +134,12 @@ export default function PulseTab() {
   };
 
   return (
-    <SafeScreen safeArea="both" className="relative overflow-hidden bg-transparent">
+    <SafeScreen
+      safeArea="both"
+      className="relative overflow-hidden bg-transparent"
+    >
       <PlumGradientBackground />
-      
+
       {/* Finance Summary */}
       <FinanceSummary
         safeToSpend={safeToSpend}
@@ -134,27 +148,51 @@ export default function PulseTab() {
         isLoading={isLoading}
         onTaxHostageLongPress={() => setIsTaxesDialogOpen(true)}
       />
-      
-      <ExpenseList
-        data={recentTransactions}
-        keyExtractor={(item) => item._id}
-        title="Recent Activity"
-        isLoading={isLoading}
-        renderItem={({ item: tx }) => (
-          <TouchableOpacity
-            className="flex-row justify-between py-2 border-b border-white/5"
-            onLongPress={() => handleTransactionLongPress(tx)}
-            delayLongPress={300}
-          >
-            <Text variant={tx.note ? "default" : "small"}>
-              {tx.note || tx.category}
-            </Text>
-            <Text variant="xs" className={getTransactionTone(tx)}>
-              {formatCurrency(getTransactionAmount(tx))}
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
+
+      {/* Recent Activity */}
+      <Card variant="transparent" className="flex-1 py-4 px-2">
+        <Text variant="large" className="mb-4">
+          Recent Activity
+        </Text>
+        <FlatList
+          data={recentTransactions}
+          keyExtractor={(item) => item._id}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            !isLoading ? (
+              <View className="py-20 items-center">
+                <Text variant="small" className="text-white/20">
+                  No Items Yet
+                </Text>
+              </View>
+            ) : null
+          }
+          renderItem={({ item: tx, index }) => {
+            const icon = getTransactionIcon(tx);
+            return (
+              <TouchableOpacity
+                onLongPress={() => handleTransactionLongPress(tx)}
+                delayLongPress={300}
+              >
+                <TimelineItem
+                  icon={icon.name}
+                  iconColor={icon.color}
+                  iconBgColor="bg-plum-deep"
+                  title={tx.note || tx.category}
+                  subtitle={tx.note ? tx.category : undefined}
+                  isFirst={index === 0}
+                  isLast={index === recentTransactions.length - 1}
+                  rightContent={
+                    <Text variant="xs" className={getTransactionTone(tx)}>
+                      {formatCurrency(getTransactionAmount(tx))}
+                    </Text>
+                  }
+                />
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </Card>
 
       <CustomButton
         variant="secondary"

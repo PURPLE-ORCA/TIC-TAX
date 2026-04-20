@@ -5,30 +5,34 @@
 @source '../node_modules/heroui-native/lib';
 
 @theme {
-  --color-primary: #c200fb;
-  --color-background: var(--color-plum-black);
+  --color-primary: #3e1444;
+  --color-background: #06000a;
+  --color-foreground: #ffffff;
+  --color-muted: #a59ab2;
+  --color-border: #2b2034;
+
+  /* Plum Color Palette */
+  --color-plum-night: #3E1444;
+  --color-plum-deep: #260C35;
+  --color-plum-charcoal: #190924;
+  --color-plum-midnight: #0E0314;
+  --color-plum-black: #06000A;
 }
 
 @layer theme {
   :root {
-    --color-primary: #c200fb;
+    --color-primary: var(--color-plum-night);
     --color-background: var(--color-plum-black);
-    --color-foreground: var(--color-plum-white);
-    --color-muted: #f5f5f5;
-    --color-border: #e5e5e5;
-    
-    /* Plum Color Palette */
-    --color-plum-night: #3E1444;
-    --color-plum-deep: #260C35;
-    --color-plum-charcoal: #190924;
-    --color-plum-midnight: #0E0314;
-    --color-plum-black: #06000A;
+    --color-foreground: #ffffff;
+    --color-muted: #a59ab2;
+    --color-border: #2b2034;
 
     @variant dark {
-      --color-background: #00120b;
+      --color-primary: var(--color-plum-night);
+      --color-background: var(--color-plum-black);
       --color-foreground: #ffffff;
-      --color-muted: #1a1a1a;
-      --color-border: #333333;
+      --color-muted: #a59ab2;
+      --color-border: #2b2034;
     }
   }
 }

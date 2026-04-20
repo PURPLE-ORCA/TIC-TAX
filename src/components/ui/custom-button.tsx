@@ -6,7 +6,7 @@ const button = tv({
   base: "h-14 rounded-xl items-center justify-center flex-row",
   variants: {
     variant: {
-      primary: "bg-primary",
+      primary: "bg-plum-night",
       secondary: "bg-primary/15",
       transparent: "bg-transparent border border-foreground/10",
     },
