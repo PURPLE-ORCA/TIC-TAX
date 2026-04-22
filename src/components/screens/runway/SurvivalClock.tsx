@@ -2,6 +2,7 @@ import { Flame, Skull } from "lucide-react-native";
 import { View } from "react-native";
 
 import { Text } from "@/src/components/ui/text";
+import { PlumCard } from "../../ui/PlumCard";
 
 export interface SurvivalClockProps {
   runwayMonths: number;
@@ -23,18 +24,18 @@ export function SurvivalClock({
   formatCurrency,
 }: SurvivalClockProps) {
   return (
-    <View className="items-center py-2 gap-2">
-      <View className="flex-row items-center gap-2 mb-2">
+    <View className="items-center gap-2">
+      <View className="flex-row items-center gap-2">
         {isCritical ? (
-          <Skull size={14} color="#ef4444" />
+          <Skull size={18} color="#ef4444" />
         ) : (
-          <Flame size={14} color="#22c55e" />
+          <Flame size={18} color="#22c55e" />
         )}
         <Text
           className={
             isCritical
-              ? "text-red-500 tracking-widest text-[10px]"
-              : "text-green-500 tracking-widest text-[10px]"
+              ? "text-red-500 tracking-widest"
+              : "text-green-500 tracking-widest"
           }
         >
           The Survival Clock
@@ -47,26 +48,25 @@ export function SurvivalClock({
         >
           {formatRunway(runwayMonths)}
         </Text>
-        <Text>Survival Time</Text>
       </View>
 
-      <View className="border-primary px-8 py-4 rounded-xl flex-row items-center gap-6 border">
+      <PlumCard className="px-8 py-4 flex-row items-center gap-6 border">
         <View>
           <Text variant="small">Monthly Burn</Text>
-          <Text className="text-foreground text-xl">
+          <Text variant="large" className="text-foreground">
             {formatCurrency(monthlyBurn).replace("+ ", "")}
           </Text>
         </View>
-        <View className="w-px h-10 bg-primary" />
+        <View className="w-px h-10 bg-white" />
         <View>
           <Text variant="small">Safe Capital</Text>
-          <Text className="text-foreground text-xl">
+          <Text variant="large" className="text-foreground">
             {financeLoading
               ? "..."
               : formatCurrency(safeToSpend).replace("+ ", "")}
           </Text>
         </View>
-      </View>
+      </PlumCard>
     </View>
   );
 }

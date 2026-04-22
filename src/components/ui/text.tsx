@@ -10,7 +10,6 @@ const text = tv({
         "text-5xl font-semibold leading-[52px] text-foreground text-primary",
       subtitle: "text-[32px] leading-[40px] font-semibold text-foreground",
       large: "text-xl font-semibold leading-7 text-foreground",
-      price: "text-2xl font-semibold leading-7 text-foreground",
       small: "text-sm leading-5 font-medium text-foreground/80",
       smallBold: "text-sm leading-5 font-bold text-foreground",
       xs: "text-xs leading-5 font-medium text-foreground/40",

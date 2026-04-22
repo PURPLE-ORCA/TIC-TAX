@@ -35,7 +35,7 @@ export function TimelineItem({
 
         {/* Icon circle */}
         <View
-          className={`size-8 rounded-full items-center justify-center shrink-0 ${iconBgColor}`}
+          className="size-8 items-center justify-center shrink-0"
         >
           <Icon name={icon} size={18} color={iconColor} />
         </View>
