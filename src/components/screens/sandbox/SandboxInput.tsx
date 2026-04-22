@@ -50,18 +50,21 @@ export function SandboxInput({
         </View>
       </View>
 
-      <CustomButton
-        variant="secondary"
-        label="Add to Sandbox"
-        onPress={onAddToSandbox}
-      />
+      <View className="flex flex-row gap-2">
+        <CustomButton
+          variant="primary"
+          label="Add to Sandbox"
+          onPress={onAddToSandbox}
+          className="w-full"
+        />
 
-      <CustomButton
-        variant="primary"
-        label={isExecuting ? 'Executing...' : 'Execute Trade'}
-        onPress={onExecuteTrade}
-        isDisabled={cartLength === 0 || isExecuting}
-      />
+        <CustomButton
+          variant="primary"
+          label={isExecuting ? "Executing..." : "Execute Trade"}
+          onPress={onExecuteTrade}
+          isDisabled={cartLength === 0 || isExecuting}
+        />
+      </View>
     </View>
   );
 }

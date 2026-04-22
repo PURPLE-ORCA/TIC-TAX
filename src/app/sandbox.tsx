@@ -103,7 +103,7 @@ export default function SandboxScreen() {
         <Text numberOfLines={1}>{item.name}</Text>
       </View>
       <View className="items-end">
-        <Text variant="price" className="text-red-500">
+        <Text variant="large" className="text-red-500">
           -{formatCurrency(item.cost).replace("+ ", "")}
         </Text>
       </View>
