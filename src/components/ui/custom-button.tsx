@@ -45,6 +45,7 @@ export function CustomButton({ variant = "primary", className, label, onPress, i
         className={button({ variant, className })}
         onPress={onPress}
         isDisabled={isDisabled}
+        feedbackVariant='scale'
       >
         {label && <Text className={labelText({ variant })}>{label}</Text>}
       </Button>

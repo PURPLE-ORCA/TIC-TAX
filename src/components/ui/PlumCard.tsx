@@ -16,7 +16,7 @@ export const PlumCard = forwardRef<
   return (
     <Card
       ref={ref}
-      className={`bg-plum-deep rounded-xl ${className ?? ""}`}
+      className={`bg-accent rounded-xl ${className ?? ""}`}
       {...rest}
     />
   );

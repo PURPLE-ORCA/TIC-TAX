@@ -12,19 +12,19 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#00120B',
-          borderTopColor: 'rgba(255,255,255,0.05)',
+          backgroundColor: "#06000A",
+          borderTopColor: "rgba(255,255,255,0.05)",
           height: tabBarHeight,
           paddingBottom: tabBarPaddingBottom,
           paddingTop: 10,
           elevation: 0,
           shadowOpacity: 0,
         },
-        tabBarActiveTintColor: '#C200FB',
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.2)',
+        tabBarActiveTintColor: "#C200FB",
+        tabBarInactiveTintColor: "rgba(255,255,255,0.2)",
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: 'bold',
+          fontWeight: "bold",
           marginTop: 4,
         },
       }}
@@ -43,7 +43,11 @@ export default function TabLayout() {
         options={{
           title: "Runway",
           tabBarIcon: ({ color, focused }) => (
-            <PlaneTakeoff size={24} color={color} strokeWidth={focused ? 3 : 2} />
+            <PlaneTakeoff
+              size={24}
+              color={color}
+              strokeWidth={focused ? 3 : 2}
+            />
           ),
         }}
       />

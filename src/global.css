@@ -5,8 +5,8 @@
 @source '../node_modules/heroui-native/lib';
 
 @theme {
-  --color-primary: #3e1444;
-  --color-background: #06000a;
+  --color-accent: var(--color-plum-charcoal);
+  --color-background: var(--color-plum-black);
   --color-foreground: #ffffff;
   --color-muted: #a59ab2;
   --color-border: #2b2034;
@@ -21,14 +21,14 @@
 
 @layer theme {
   :root {
-    --color-primary: var(--color-plum-night);
+    --color-accent: var(--color-plum-charcoal);
     --color-background: var(--color-plum-black);
     --color-foreground: #ffffff;
     --color-muted: #a59ab2;
     --color-border: #2b2034;
 
     @variant dark {
-      --color-primary: var(--color-plum-night);
+      --color-accent: var(--color-plum-charcoal);
       --color-background: var(--color-plum-black);
       --color-foreground: #ffffff;
       --color-muted: #a59ab2;
