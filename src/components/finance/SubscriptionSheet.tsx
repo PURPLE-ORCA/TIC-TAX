@@ -9,7 +9,6 @@ import {
 } from 'heroui-native';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Check } from 'lucide-react-native';
 import { Text } from '@/src/components/ui/text';
 
 interface SubscriptionSheetProps {
@@ -88,16 +87,15 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
 
             {/* Submit Button */}
             <Button 
-              variant="secondary"
+              variant="primary"
               onPress={handleSubmit}
               isDisabled={!name || !monthlyCost || isSubmitting}
             >
               {isSubmitting ? (
-                <Button.Label className="text-white font-bold text-lg">Adding...</Button.Label>
+                <Button.Label >Adding...</Button.Label>
               ) : (
                 <>
-                  <Check color="white" size={24} strokeWidth={3} />
-                  <Button.Label className="text-white font-bold text-lg ml-2">Add Subscription</Button.Label>
+                  <Button.Label>Add Subscription</Button.Label>
                 </>
               )}
             </Button>

@@ -13,7 +13,6 @@ import {
   TextField,
   cn,
 } from "heroui-native";
-import { Check } from "lucide-react-native";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -195,12 +194,7 @@ export function TransactionSheet({
                     <Chip
                       key={cat}
                       onPress={() => setCategory(cat)}
-                      className={cn(
-                        "px-2 rounded-xl",
-                        category === cat
-                          ? "bg-primary border-primary"
-                          : "bg-white/5",
-                      )}
+                      variant="primary"
                     >
                       <Chip.Label
                         className={cn(
@@ -220,22 +214,17 @@ export function TransactionSheet({
 
             {/* Submit Button */}
             <Button
-              variant="secondary"
+              variant="primary"
               onPress={handleSubmit}
               isDisabled={!amount || isSubmitting}
             >
               <Show>
                 <Show.When condition={isSubmitting}>
-                  <Button.Label className="text-white font-bold text-lg">
-                    Logging...
-                  </Button.Label>
+                  <Button.Label>Logging...</Button.Label>
                 </Show.When>
                 <Show.Else>
                   <>
-                    <Check color="white" size={24} strokeWidth={3} />
-                    <Button.Label className="text-white font-bold text-lg ml-2">
-                      Confirm
-                    </Button.Label>
+                    <Button.Label>Confirm</Button.Label>
                   </>
                 </Show.Else>
               </Show>

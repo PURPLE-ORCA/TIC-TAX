@@ -8,12 +8,16 @@ import { DeleteSubscriptionDialog } from "@/src/components/screens/runway/Delete
 import { SurvivalClock } from "@/src/components/screens/runway/SurvivalClock";
 import { CustomButton } from "@/src/components/ui/custom-button";
 import { ExpenseList } from "@/src/components/ui/expense-list";
+import { Icon } from "@/src/components/ui/icon";
+import { PlumGradientBackground } from "@/src/components/ui/PlumGradientBackground";
 import { Text } from "@/src/components/ui/text";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "expo-router";
+import { Button } from "heroui-native";
 import { Calculator } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
+
 
 export default function RunwayScreen() {
   const router = useRouter();
@@ -73,7 +77,12 @@ export default function RunwayScreen() {
       onLongPress={() => openDeleteDialog(item._id)}
       delayLongPress={300}
     >
-      <View className="flex-1 mr-4">
+      <View
+        className="size-8 items-center justify-center shrink-0"
+      >
+        <Icon name="arrow-up-outline" size={18} color="red" />
+      </View>
+      <View className="flex-1 mr-8">
         <Text numberOfLines={1}>{item.name}</Text>
       </View>
       <View className="items-end">
@@ -87,15 +96,19 @@ export default function RunwayScreen() {
   return (
     <SafeScreen safeArea="both">
       <View className="flex-row justify-end">
-        <TouchableOpacity
-          className="size-12 items-center justify-center rounded-xl"
+        <Button
+          variant="ghost"
+          isIconOnly
+          feedbackVariant="scale"
+          className="z-99"
           onPress={() => router.push("/sandbox")}
-          accessibilityRole="button"
           accessibilityLabel="Open opportunity cost sandbox"
         >
           <Calculator size={18} color="white" />
-        </TouchableOpacity>
+        </Button>
       </View>
+
+      <PlumGradientBackground />
 
       {/* Survival Clock */}
       <SurvivalClock

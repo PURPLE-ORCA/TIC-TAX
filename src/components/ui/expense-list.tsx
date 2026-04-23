@@ -27,9 +27,9 @@ export function ExpenseList<T>({
     <View className="flex-1 py-4">
       <RenderIf condition={!!title}>
         <View className="flex-row items-center justify-between mb-2">
-          <Text variant="smallBold">{title}</Text>
+          <Text variant="large">{title}</Text>
           <RenderIf condition={!!badge}>
-            <Chip variant="soft" color="danger" size="sm">
+            <Chip variant="soft" color="danger" size="md">
               <Chip.Label>{badge}</Chip.Label>
             </Chip>
           </RenderIf>
