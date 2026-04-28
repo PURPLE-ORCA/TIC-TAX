@@ -12,20 +12,22 @@
   --color-border: #2b2034;
 
   /* Plum Color Palette */
-  --color-plum-night: #3E1444;
-  --color-plum-deep: #260C35;
+  --color-plum-night: #3e1444;
+  --color-plum-deep: #260c35;
   --color-plum-charcoal: #190924;
-  --color-plum-midnight: #0E0314;
-  --color-plum-black: #06000A;
+  --color-plum-midnight: #0e0314;
+  --color-plum-black: #06000a;
 }
 
 @layer theme {
   :root {
-    --color-accent: var(--color-plum-charcoal);
-    --color-background: var(--color-plum-black);
-    --color-foreground: #ffffff;
-    --color-muted: #a59ab2;
-    --color-border: #2b2034;
+    @variant light {
+      --color-accent: var(--color-plum-charcoal);
+      --color-background: var(--color-plum-black);
+      --color-foreground: #ffffff;
+      --color-muted: #a59ab2;
+      --color-border: #2b2034;
+    }
 
     @variant dark {
       --color-accent: var(--color-plum-charcoal);
