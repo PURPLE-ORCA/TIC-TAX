@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "app-icon": {
+      "source": "code-with-beto/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/cwb-app-icon/skills/app-icon/SKILL.md",
+      "computedHash": "dc551a26318622c831286711961a4cab90e134bf3378083d9cfe1e52bb466524"
+    },
     "building-native-ui": {
       "source": "expo/skills",
       "sourceType": "github",
@@ -65,6 +71,12 @@
       "source": "expo/skills",
       "sourceType": "github",
       "computedHash": "c1e47893d207b68c9a2a5b0de3f97042f82a65c0b3c3a33a7114029211b8e89b"
+    },
+    "local-build": {
+      "source": "code-with-beto/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/cwb-local-build/skills/local-build/SKILL.md",
+      "computedHash": "f3acb2db4ca83817502592e74efc73bf4057dc22b56d234da0075183e11df457"
     },
     "universal-docs": {
       "source": "PURPLE-ORCA/skills",
