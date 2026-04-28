@@ -119,6 +119,9 @@ export default function SandboxScreen() {
       <OpportunityCost
         runwayLostDays={runwayLostDays}
         hustleRequired={hustleRequired}
+        remainingCapital={remainingCapital}
+        safeToSpend={safeToSpend}
+        totalCartCost={totalCartCost}
         formatCurrency={formatCurrency}
       />
 
