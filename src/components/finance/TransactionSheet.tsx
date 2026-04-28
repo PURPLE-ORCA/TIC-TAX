@@ -1,4 +1,5 @@
 import { api } from "@/convex/_generated/api";
+import { CATEGORIES } from "@/src/components/screens/home/constants";
 import { RenderIf } from "@/src/components/helpers/render-if";
 import { Show } from "@/src/components/helpers/show";
 import { Text } from "@/src/components/ui/text";
@@ -20,8 +21,6 @@ interface TransactionSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const CATEGORIES = ["Taxi", "Food", "SaaS", "Junk"];
 
 export function TransactionSheet({
   isOpen,
@@ -73,7 +72,7 @@ export function TransactionSheet({
         >
           <View className="gap-8 pb-safe">
             <View className="items-center">
-              <Text variant="large" className="text-foreground font-bold">
+              <Text variant="large">
                 New Transaction
               </Text>
             </View>

@@ -3,6 +3,7 @@ import { TimelineItem } from "@/src/components/ui/Timeline";
 import { Text } from "@/src/components/ui/text";
 import { Card } from "heroui-native";
 import { FlatList, TouchableOpacity, View } from "react-native";
+import { CATEGORY_ICONS } from "./constants";
 
 type TransactionType = "IN" | "OUT";
 type TransactionStatus = "PENDING" | "CLEARED";
@@ -25,13 +26,15 @@ export interface RecentActivitySectionProps<
 }
 
 function getTransactionIcon(tx: RecentActivityTransaction) {
+  const name = CATEGORY_ICONS[tx.category as keyof typeof CATEGORY_ICONS] ?? "help-circle";
+
   if (tx.type === "IN" && tx.status === "PENDING") {
-    return { name: "time-outline" as const, color: "#fbbf24" };
+    return { name, color: "#fbbf24" };
   }
   if (tx.type === "IN") {
-    return { name: "arrow-down-outline" as const, color: "green" };
+    return { name, color: "#22c55e" };
   }
-  return { name: "arrow-up-outline" as const, color: "red" };
+  return { name, color: "#ef4444" };
 }
 
 function getTransactionTone(tx: RecentActivityTransaction) {
