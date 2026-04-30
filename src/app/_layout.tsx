@@ -1,7 +1,6 @@
 import "@/src/polyfills";
 import "@/src/global.css";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import { ConvexReactClient } from "convex/react";
 import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -14,15 +13,9 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { Uniwind } from "uniwind";
 import { useEffect } from "react";
+import { convexClient } from "@/src/lib/convex/client";
 import { initLedgerDatabase } from "@/src/lib/ledger/sqlite";
-
-const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
-
-if (!convexUrl) {
-  throw new Error("Missing EXPO_PUBLIC_CONVEX_URL");
-}
-
-const convex = new ConvexReactClient(convexUrl);
+import { useLedgerStore } from "@/src/store/useLedgerStore";
 
 const secureStorage = {
   getItem: SecureStore.getItemAsync,
@@ -37,7 +30,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   useEffect(() => {
     Uniwind.setTheme("dark");
-    void initLedgerDatabase();
+    void initLedgerDatabase().then(() => useLedgerStore.getState().hydrate());
 
     if (Platform.OS === "android") {
       NavigationBar.setStyle("dark");
@@ -50,7 +43,7 @@ export default function RootLayout() {
       <GestureHandlerRootView className="flex-1">
         <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
           <HeroUINativeProvider>
-            <ConvexAuthProvider client={convex} storage={secureStorage}>
+            <ConvexAuthProvider client={convexClient} storage={secureStorage}>
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />

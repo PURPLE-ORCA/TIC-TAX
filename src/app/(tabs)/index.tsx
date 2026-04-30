@@ -1,5 +1,3 @@
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { TransactionSheet } from "@/src/components/finance/TransactionSheet";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
@@ -10,7 +8,7 @@ import { PayTaxesDialog } from "@/src/components/screens/home/PayTaxesDialog";
 import { RecentActivitySection } from "@/src/components/screens/home/RecentActivitySection";
 import { CustomButton } from "@/src/components/ui/custom-button";
 import { PlumGradientBackground } from "@/src/components/ui/PlumGradientBackground";
-import { useMutation } from "convex/react";
+import { useLedgerStore } from "@/src/store/useLedgerStore";
 import { useState } from "react";
 
 export default function PulseTab() {
@@ -22,22 +20,20 @@ export default function PulseTab() {
     isLoading,
   } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [pendingDeleteId, setPendingDeleteId] =
-    useState<Id<"transactions"> | null>(null);
-  const [pendingClearId, setPendingClearId] =
-    useState<Id<"transactions"> | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [pendingClearId, setPendingClearId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
   const [isTaxesDialogOpen, setIsTaxesDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearingInvoice, setIsClearingInvoice] = useState(false);
   const [isPayingTaxes, setIsPayingTaxes] = useState(false);
-  const deleteTransaction = useMutation(api.transactions.deleteTransaction);
-  const clearInvoice = useMutation(api.transactions.clearInvoice);
-  const markTaxesPaid = useMutation(api.transactions.markTaxesPaid);
+  const cancelTransaction = useLedgerStore((state) => state.cancelTransaction);
+  const clearIncome = useLedgerStore((state) => state.clearIncome);
+  const markTaxesPaid = useLedgerStore((state) => state.markTaxesPaid);
   type RecentTransaction = (typeof recentTransactions)[number];
 
-  const openDeleteDialog = (id: Id<"transactions">) => {
+  const openDeleteDialog = (id: string) => {
     setPendingDeleteId(id);
     setIsDeleteDialogOpen(true);
   };
@@ -47,7 +43,7 @@ export default function PulseTab() {
     if (!open) setPendingDeleteId(null);
   };
 
-  const openClearDialog = (id: Id<"transactions">) => {
+  const openClearDialog = (id: string) => {
     setPendingClearId(id);
     setIsClearDialogOpen(true);
   };
@@ -71,7 +67,7 @@ export default function PulseTab() {
 
     setIsDeleting(true);
     try {
-      await deleteTransaction({ id: pendingDeleteId });
+      await cancelTransaction(pendingDeleteId);
       setIsDeleteDialogOpen(false);
       setPendingDeleteId(null);
     } catch (error) {
@@ -86,7 +82,7 @@ export default function PulseTab() {
 
     setIsClearingInvoice(true);
     try {
-      await clearInvoice({ id: pendingClearId });
+      await clearIncome(pendingClearId);
       setIsClearDialogOpen(false);
       setPendingClearId(null);
     } catch (error) {
@@ -101,7 +97,7 @@ export default function PulseTab() {
 
     setIsPayingTaxes(true);
     try {
-      await markTaxesPaid({});
+      await markTaxesPaid();
       setIsTaxesDialogOpen(false);
     } catch (error) {
       console.error("Failed to mark taxes paid:", error);

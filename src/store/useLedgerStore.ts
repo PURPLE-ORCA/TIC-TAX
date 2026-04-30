@@ -1,0 +1,171 @@
+import { create } from 'zustand';
+import { v4 as uuidv4 } from 'uuid';
+
+import {
+  insertTransaction,
+  selectAllTransactions,
+  updateTransactionStatus as updateTransactionStatusInDb,
+} from '@/src/lib/ledger/repository';
+import type { LedgerTransactionRow } from '@/src/lib/ledger/types';
+
+type AddLedgerTransactionInput = {
+  type: LedgerTransactionRow['type'];
+  amount: number;
+  status: LedgerTransactionRow['status'];
+  taxRate?: number;
+};
+
+type LedgerStore = {
+  transactions: LedgerTransactionRow[];
+  isHydrated: boolean;
+  hydrate: () => Promise<void>;
+  addTransaction: (input: AddLedgerTransactionInput) => Promise<void>;
+  cancelTransaction: (id: string) => Promise<void>;
+  clearIncome: (id: string) => Promise<void>;
+  markTaxesPaid: () => Promise<void>;
+  refreshFromDb: () => Promise<void>;
+};
+
+let triggerSync: (() => void) | null = null;
+
+export function registerLedgerSyncTrigger(callback: () => void): void {
+  triggerSync = callback;
+}
+
+function requestSync(): void {
+  triggerSync?.();
+}
+
+function sortDesc(rows: LedgerTransactionRow[]): LedgerTransactionRow[] {
+  return rows.toSorted((a, b) => b.created_at - a.created_at);
+}
+
+function buildLedgerTransaction(
+  input: AddLedgerTransactionInput,
+  now: number,
+): LedgerTransactionRow {
+  return {
+    id: uuidv4(),
+    type: input.type,
+    amount: input.amount,
+    status: input.status,
+    tax_rate: input.taxRate ?? 100,
+    is_synced: 0,
+    sync_attempts: 0,
+    last_error: null,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export const useLedgerStore = create<LedgerStore>((set, get) => ({
+  transactions: [],
+  isHydrated: false,
+
+  hydrate: async () => {
+    const startedAt = Date.now();
+    const rows = await selectAllTransactions();
+    set({ transactions: rows, isHydrated: true });
+
+    const elapsed = Date.now() - startedAt;
+    if (__DEV__ && elapsed > 100) {
+      console.warn(`Ledger hydration took ${elapsed}ms (target < 100ms)`);
+    }
+  },
+
+  refreshFromDb: async () => {
+    const rows = await selectAllTransactions();
+    set({ transactions: rows });
+  },
+
+  addTransaction: async (input) => {
+    const now = Date.now();
+    const row = buildLedgerTransaction(input, now);
+
+    await insertTransaction(row);
+
+    set((state) => ({
+      transactions: sortDesc([...state.transactions, row]),
+    }));
+
+    requestSync();
+  },
+
+  cancelTransaction: async (id) => {
+    const now = Date.now();
+    await updateTransactionStatusInDb(id, 'CANCELLED', now);
+
+    set((state) => ({
+      transactions: state.transactions.map((row) =>
+        row.id === id
+          ? {
+              ...row,
+              status: 'CANCELLED',
+              updated_at: now,
+              is_synced: 0,
+              sync_attempts: 0,
+              last_error: null,
+            }
+          : row,
+      ),
+    }));
+
+    requestSync();
+  },
+
+  clearIncome: async (id) => {
+    const now = Date.now();
+    await updateTransactionStatusInDb(id, 'CLEARED', now);
+
+    set((state) => ({
+      transactions: state.transactions.map((row) =>
+        row.id === id
+          ? {
+              ...row,
+              status: 'CLEARED',
+              updated_at: now,
+              is_synced: 0,
+              sync_attempts: 0,
+              last_error: null,
+            }
+          : row,
+      ),
+    }));
+
+    requestSync();
+  },
+
+  markTaxesPaid: async () => {
+    const activeRows = get().transactions.filter((row) => row.status !== 'CANCELLED');
+    const taxHostage = activeRows.reduce((sum, row) => {
+      if (row.type !== 'INCOME' || row.status !== 'CLEARED') {
+        return sum;
+      }
+
+      return sum + Math.trunc((row.amount * row.tax_rate) / 10000);
+    }, 0);
+
+    if (taxHostage <= 0) {
+      return;
+    }
+
+    const now = Date.now();
+    const paymentRow = buildLedgerTransaction(
+      {
+        type: 'TAX_PAYMENT',
+        amount: taxHostage,
+        status: 'CLEARED',
+        taxRate: 100,
+      },
+      now,
+    );
+
+    await insertTransaction(paymentRow);
+
+    set((state) => ({
+      transactions: sortDesc([...state.transactions, paymentRow]),
+    }));
+
+    requestSync();
+  },
+}));

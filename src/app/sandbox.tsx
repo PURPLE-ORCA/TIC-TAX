@@ -1,16 +1,16 @@
-import { api } from "@/convex/_generated/api";
 import { useFinance } from "@/src/components/hooks/useFinance";
 import { SafeScreen } from "@/src/components/layout/SafeScreen";
 import { formatCurrency } from "@/src/components/lib/format-currency";
+import { toCents } from "@/src/lib/ledger/money";
 import { OpportunityCost } from "@/src/components/screens/sandbox/OpportunityCost";
 import { SandboxInput } from "@/src/components/screens/sandbox/SandboxInput";
 import { BackButton } from "@/src/components/ui/back-button";
 import { ExpenseList } from "@/src/components/ui/expense-list";
 import { Text } from "@/src/components/ui/text";
-import { useMutation } from "convex/react";
 import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
+import { useLedgerStore } from "@/src/store/useLedgerStore";
 
 type SandboxItem = {
   id: string;
@@ -21,7 +21,7 @@ type SandboxItem = {
 export default function SandboxScreen() {
   const router = useRouter();
   const { safeToSpend, totalBleed } = useFinance();
-  const logTransaction = useMutation(api.transactions.logTransaction);
+  const addTransaction = useLedgerStore((state) => state.addTransaction);
 
   const [cart, setCart] = useState<SandboxItem[]>([]);
   const [itemName, setItemName] = useState("");
@@ -52,8 +52,8 @@ export default function SandboxScreen() {
 
   const addToSandbox = () => {
     const cleanName = itemName.trim();
-    const cost = Number.parseFloat(itemCost);
-    if (!cleanName || Number.isNaN(cost) || cost <= 0) return;
+    const cost = toCents(itemCost);
+    if (!cleanName || cost <= 0) return;
 
     const nextItem: SandboxItem = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -77,11 +77,11 @@ export default function SandboxScreen() {
     try {
       await Promise.all(
         cart.map((item) =>
-          logTransaction({
-            type: "OUT",
+          addTransaction({
+            type: "EXPENSE",
             amount: item.cost,
-            category: "Sandbox",
-            note: item.name,
+            status: "CLEARED",
+            taxRate: 100,
           }),
         ),
       );
