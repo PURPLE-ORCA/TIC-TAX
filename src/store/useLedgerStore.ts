@@ -35,11 +35,14 @@ export function registerLedgerSyncTrigger(callback: () => void): void {
 }
 
 function requestSync(): void {
+  if (__DEV__) {
+    console.log('[ledger-store] requestSync');
+  }
   triggerSync?.();
 }
 
 function sortDesc(rows: LedgerTransactionRow[]): LedgerTransactionRow[] {
-  return rows.toSorted((a, b) => b.created_at - a.created_at);
+  return [...rows].sort((a, b) => b.created_at - a.created_at);
 }
 
 function buildLedgerTransaction(
@@ -86,11 +89,41 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
     const now = Date.now();
     const row = buildLedgerTransaction(input, now);
 
-    await insertTransaction(row);
+    if (__DEV__) {
+      console.log('[ledger-store] addTransaction:start', {
+        id: row.id,
+        type: row.type,
+        amount: row.amount,
+        status: row.status,
+        category: row.category,
+        hasNote: !!row.note,
+      });
+    }
 
     set((state) => ({
       transactions: sortDesc([...state.transactions, row]),
     }));
+
+    if (__DEV__) {
+      console.log('[ledger-store] addTransaction:stateUpdated', { id: row.id });
+    }
+
+    try {
+      await insertTransaction(row);
+    } catch (error) {
+      if (__DEV__) {
+        console.error('[ledger-store] addTransaction:persistError', error);
+      }
+
+      set((state) => ({
+        transactions: state.transactions.filter((tx) => tx.id !== row.id),
+      }));
+      throw error;
+    }
+
+    if (__DEV__) {
+      console.log('[ledger-store] addTransaction:inserted', { id: row.id });
+    }
 
     requestSync();
   },

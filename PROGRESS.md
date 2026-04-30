@@ -454,3 +454,57 @@ Stabilized offline architecture after production regression: restored legacy tax
 *MISSION COMPLETE: Offline mode no longer degrades transaction titles to generic labels when cloud notes exist.*
 
 *SUB-MISSION COMPLETE: Legacy Convex rows remain compatible while strict offline sync behavior is preserved.*
+
+---
+
+# MISSION_DEBRIEF: OFFLINE MODE WRITE-PATH STABILIZATION
+
+## Status: COMPLETE
+
+Fixed the offline transaction pipeline after expense creation failed to close the sheet, update Recent Activity, and adjust Safe to Spend. Root cause was not one bug. Obviously. It was a small clown car.
+
+### 1. Root Cause
+
+- `TransactionSheet` stopped awaiting `addTransaction`, so UI success state could run before local persistence finished.
+- `useLedgerStore.addTransaction` triggered sync before SQLite insert completed, letting sync scan `is_synced = 0` rows before the new row existed.
+- `flushLedgerSync` dropped sync requests when a flush was already active instead of queueing a rerun.
+- Pull cursor used `createdAt`, which can miss late-synced offline rows because their creation time is older than the last pull cursor.
+- Hermes does not support `Array.prototype.toSorted`, so transaction sorting crashed on device before SQLite insert.
+
+### 2. Write Path Repair
+
+- `TransactionSheet` now awaits `addTransaction` before closing the bottom sheet.
+- `useLedgerStore.addTransaction` keeps optimistic Zustand updates, but awaits SQLite insert before requesting sync.
+- SQLite insert failure rolls back the optimistic row and rethrows, so the sheet does not pretend success.
+- `sortDesc` now uses `[...rows].sort(...)` for Hermes compatibility. Fancy JS method died; boring method works. Shocking.
+
+### 3. Sync Engine Repair
+
+- Sync now checks NetInfo before calling Convex, so offline writes stay pending instead of logging fake failures.
+- If sync is already running, a rerun is queued with `shouldRunAgain` instead of dropping the request.
+- Existing local rows are upserted from remote when Convex has newer `updatedAt`.
+- `refreshFromDb()` still runs after sync, keeping Zustand aligned with SQLite.
+
+### 4. Convex Pull Cursor Repair
+
+- Added `by_updatedAt` index to `convex/schema.ts`.
+- `transactions.listTransactionsSince` now queries by `updatedAt`, not `createdAt`.
+- Convex insert/update normalizes `updatedAt` to server sync/update time, making late offline rows visible to future pulls and other devices.
+
+### 5. Documentation
+
+- Updated `docs/offline-mode.md` to reflect real optimistic write order.
+- Documented `by_updatedAt`, queued sync reruns, offline sync skip, and newer-remote local repair.
+
+### 6. Verification
+
+- `bun run typecheck` passes.
+- `bun run lint` passes with only two unrelated warnings:
+  - `src/app/(tabs)/runway.tsx` subscription dependency warning.
+  - `src/components/ui/custom-button.tsx` unused `VariantProps` warning.
+
+---
+
+*MISSION COMPLETE: Offline expense creation now updates UI instantly, survives reconnect, syncs to Convex, and no longer explodes because Hermes lacks shiny array toys.*
+
+*SUB-MISSION COMPLETE: SQLite is source of truth again. Not vibes. Actual source of truth.*

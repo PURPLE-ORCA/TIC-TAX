@@ -21,6 +21,7 @@ import { AppState } from 'react-native';
 
 let isSyncing = false;
 let isInitialized = false;
+let shouldRunAgain = false;
 
 function isPermanentSyncError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
@@ -62,6 +63,10 @@ export async function pullFromConvex(forceFull = false): Promise<void> {
   });
 
   if (remoteRows.length === 0) {
+    if (forceFull || !hasCompletedFullPull) {
+      await setCompletedFullPullPreference(true);
+      await setLastPullTimestampPreference(since);
+    }
     return;
   }
 
@@ -83,8 +88,8 @@ export async function pullFromConvex(forceFull = false): Promise<void> {
 
     const updatedAt = remoteRow.updatedAt ?? createdAt;
 
-    if (createdAt > maxTimestamp) {
-      maxTimestamp = createdAt;
+    if (updatedAt > maxTimestamp) {
+      maxTimestamp = updatedAt;
     }
 
     if (pendingLocalIds.has(clientUuid)) {
@@ -107,6 +112,23 @@ export async function pullFromConvex(forceFull = false): Promise<void> {
           shouldPatchCategory ? (remoteRow.category ?? null) : null,
           shouldPatchNote ? (remoteRow.note ?? null) : null,
         );
+      }
+
+      if (updatedAt > existingLocal.updated_at) {
+        await upsertTransaction({
+          id: clientUuid,
+          type: remoteRow.type,
+          amount,
+          status,
+          category: remoteRow.category ?? existingLocal.category,
+          note: remoteRow.note ?? existingLocal.note,
+          tax_rate: taxRate,
+          is_synced: 1,
+          sync_attempts: 0,
+          last_error: null,
+          created_at: createdAt,
+          updated_at: updatedAt,
+        });
       }
       continue;
     }
@@ -150,27 +172,58 @@ export async function bootstrapLedgerFromConvex(): Promise<void> {
 
 export async function flushLedgerSync(): Promise<void> {
   if (isSyncing) {
+    shouldRunAgain = true;
+    if (__DEV__) {
+      console.log('[sync] flush:queue already syncing');
+    }
     return;
   }
 
   isSyncing = true;
   try {
-    const pending = await getPendingSyncTransactions();
-
-    for (const row of pending) {
-      try {
-        await syncTransaction(row);
-      } catch (error) {
-        const permanent = isPermanentSyncError(error);
-        const message = error instanceof Error ? error.message : String(error);
-        await markTransactionSyncFailure(row.id, message, permanent);
+    do {
+      shouldRunAgain = false;
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected || netInfo.isInternetReachable === false) {
+        return;
       }
-    }
 
-    await pullFromConvex();
+      if (__DEV__) {
+        console.log('[sync] flush:start');
+      }
+      const pending = await getPendingSyncTransactions();
+
+      if (__DEV__) {
+        console.log('[sync] flush:pending', { count: pending.length });
+      }
+
+      for (const row of pending) {
+        try {
+          await syncTransaction(row);
+          if (__DEV__) {
+            console.log('[sync] push:ok', { id: row.id });
+          }
+        } catch (error) {
+          const permanent = isPermanentSyncError(error);
+          const message = error instanceof Error ? error.message : String(error);
+          if (__DEV__) {
+            console.error('[sync] push:error', { id: row.id, permanent, message });
+          }
+          await markTransactionSyncFailure(row.id, message, permanent);
+        }
+      }
+
+      await pullFromConvex();
+      if (__DEV__) {
+        console.log('[sync] pull:ok');
+      }
+    } while (shouldRunAgain);
   } finally {
     isSyncing = false;
     await useLedgerStore.getState().refreshFromDb();
+    if (__DEV__) {
+      console.log('[sync] flush:done');
+    }
   }
 }
 

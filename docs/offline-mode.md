@@ -72,6 +72,7 @@ Indexes:
 
 - `by_clientUuid`
 - `by_createdAt`
+- `by_updatedAt`
 
 ---
 
@@ -89,9 +90,10 @@ File: `src/app/_layout.tsx`
 ## Write Path (Optimistic)
 
 1. Generate UUID.
-2. Insert row into SQLite with `is_synced = 0`.
-3. Update Zustand immediately.
-4. Trigger sync loop.
+2. Update Zustand optimistically for immediate UI feedback.
+3. Insert row into SQLite with `is_synced = 0` and await the commit.
+4. Roll back the optimistic row if SQLite fails.
+5. Trigger sync loop only after SQLite commit succeeds.
 
 Key files:
 
@@ -114,14 +116,17 @@ Triggers:
 - Failure -> increment `sync_attempts`.
 - Permanent validation failure -> set `last_error`.
 - Category and note metadata are pushed with every transaction payload.
+- Sync trigger is ignored while offline; SQLite keeps rows pending until network restores.
+- If a flush is already active, a rerun is queued instead of dropping the request.
 
 ### Pull phase
 
 - Bootstrap pull runs with `since = 0` (full pull) to repair/seed local metadata.
 - After bootstrap, read `lastPullTimestamp` from SecureStore.
-- Query Convex: `transactions.listTransactionsSince({ since, limit })`.
+- Query Convex by `updatedAt`: `transactions.listTransactionsSince({ since, limit })`.
 - Skip pending unsynced local rows to avoid stomping optimistic writes.
 - Existing local rows are metadata-repaired from cloud (`category`/`note`) when local values are generic or missing.
+- Existing local rows are replaced when the remote row has newer `updatedAt`.
 - Upsert new rows into SQLite with `is_synced = 1`.
 - Update `lastPullTimestamp`.
 

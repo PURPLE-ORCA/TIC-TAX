@@ -39,14 +39,14 @@ export function useFinance() {
     }
   }
 
-  const visibleTransactions: Array<{
+  const visibleTransactions: {
     _id: string;
     amount: number;
     category: string;
     note?: string;
     type: 'IN' | 'OUT';
     status?: 'PENDING' | 'CLEARED';
-  }> = transactions
+  }[] = transactions
     .filter((tx) => tx.status !== 'CANCELLED')
     .slice(0, 10)
     .map((tx) => ({

@@ -39,6 +39,8 @@ async function insertIfMissingByClientUuid(
     return { ok: true as const, duplicate: true as const, id: existing._id };
   }
 
+  const syncedAt = Date.now();
+
   const taxAmount =
     input.type === 'INCOME' && input.status === 'CLEARED'
       ? Math.trunc((input.amount * input.taxRate) / 10000)
@@ -56,7 +58,7 @@ async function insertIfMissingByClientUuid(
     timestamp: input.createdAt,
     taxRate: input.taxRate,
     createdAt: input.createdAt,
-    updatedAt: input.updatedAt,
+    updatedAt: Math.max(input.updatedAt, syncedAt),
   });
 
   return { ok: true as const, duplicate: false as const, id };
@@ -84,7 +86,7 @@ export const addTransaction = mutation({
       note: args.note,
       taxRate: args.taxRate ?? 100,
       createdAt: args.createdAt,
-      updatedAt: args.updatedAt,
+      updatedAt: Math.max(args.updatedAt, Date.now()),
     });
   },
 });
@@ -295,7 +297,7 @@ export const listTransactionsSince = query({
     const limit = Math.min(Math.max(args.limit ?? 500, 1), 1000);
     const rows = await ctx.db
       .query('transactions')
-      .withIndex('by_createdAt', (q) => q.gt('createdAt', args.since))
+      .withIndex('by_updatedAt', (q) => q.gt('updatedAt', args.since))
       .order('asc')
       .take(limit);
 

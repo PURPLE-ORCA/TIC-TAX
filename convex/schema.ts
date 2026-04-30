@@ -27,7 +27,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_clientUuid", ["clientUuid"])
-    .index("by_createdAt", ["createdAt"]),
+    .index("by_createdAt", ["createdAt"])
+    .index("by_updatedAt", ["updatedAt"]),
 
   subscriptions: defineTable({
     name: v.string(),

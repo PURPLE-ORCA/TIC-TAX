@@ -37,6 +37,17 @@ export function TransactionSheet({
 
   const handleSubmit = async () => {
     const amountCents = toCents(amount);
+    if (__DEV__) {
+      console.log('[tx-sheet] submit:start', {
+        rawAmount: amount,
+        parsedCents: amountCents,
+        type,
+        isPending,
+        category,
+        noteLength: note.trim().length,
+      });
+    }
+
     if (amountCents <= 0) return;
 
     setIsSubmitting(true);
@@ -49,11 +60,17 @@ export function TransactionSheet({
         note: note.trim() || undefined,
         taxRate: 100,
       });
+      if (__DEV__) {
+        console.log('[tx-sheet] submit:success');
+      }
       setAmount("");
       setNote("");
       setIsPending(false);
       onOpenChange(false);
     } catch (error) {
+      if (__DEV__) {
+        console.error('[tx-sheet] submit:error', error);
+      }
       console.error("Failed to log transaction:", error);
     } finally {
       setIsSubmitting(false);

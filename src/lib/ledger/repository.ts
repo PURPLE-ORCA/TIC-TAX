@@ -28,6 +28,14 @@ export async function selectAllTransactions(): Promise<LedgerTransactionRow[]> {
 
 export async function insertTransaction(row: LedgerTransactionRow): Promise<void> {
   const db = getLedgerDatabase();
+  if (__DEV__) {
+    console.log('[ledger-repo] insert:start', {
+      id: row.id,
+      amount: row.amount,
+      type: row.type,
+      status: row.status,
+    });
+  }
   await db.runAsync(
     `INSERT INTO transactions (
       id, type, amount, status, category, note, tax_rate, is_synced, sync_attempts, last_error, created_at, updated_at
@@ -47,6 +55,9 @@ export async function insertTransaction(row: LedgerTransactionRow): Promise<void
       row.updated_at,
     ],
   );
+  if (__DEV__) {
+    console.log('[ledger-repo] insert:ok', { id: row.id });
+  }
 }
 
 export async function upsertTransaction(row: LedgerTransactionRow): Promise<void> {
