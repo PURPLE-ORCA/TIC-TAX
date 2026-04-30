@@ -15,6 +15,7 @@ import { Uniwind } from "uniwind";
 import { useEffect } from "react";
 import { convexClient } from "@/src/lib/convex/client";
 import { initLedgerDatabase } from "@/src/lib/ledger/sqlite";
+import { startLedgerSyncEngine } from "@/src/lib/ledger/sync-manager";
 import { useLedgerStore } from "@/src/store/useLedgerStore";
 
 const secureStorage = {
@@ -31,6 +32,7 @@ export default function RootLayout() {
   useEffect(() => {
     Uniwind.setTheme("dark");
     void initLedgerDatabase().then(() => useLedgerStore.getState().hydrate());
+    startLedgerSyncEngine();
 
     if (Platform.OS === "android") {
       NavigationBar.setStyle("dark");
