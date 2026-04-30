@@ -52,7 +52,16 @@ export function useFinance() {
     .map((tx) => ({
       _id: tx.id,
       amount: centsToAmount(tx.amount),
-      category: tx.type === 'SUBSCRIPTION' ? 'Subscription' : 'Ledger',
+      category:
+        tx.category ??
+        (tx.type === 'SUBSCRIPTION'
+          ? 'Subscription'
+          : tx.type === 'INCOME'
+            ? 'Income'
+            : tx.type === 'TAX_PAYMENT'
+              ? 'Tax Payment'
+              : 'Expense'),
+      note: tx.note ?? undefined,
       type: tx.type === 'INCOME' ? 'IN' : 'OUT',
       status: tx.status === 'PENDING' ? 'PENDING' : 'CLEARED',
     }));

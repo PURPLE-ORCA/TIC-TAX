@@ -12,6 +12,8 @@ type AddLedgerTransactionInput = {
   type: LedgerTransactionRow['type'];
   amount: number;
   status: LedgerTransactionRow['status'];
+  category?: string;
+  note?: string;
   taxRate?: number;
 };
 
@@ -49,6 +51,8 @@ function buildLedgerTransaction(
     type: input.type,
     amount: input.amount,
     status: input.status,
+    category: input.category ?? null,
+    note: input.note ?? null,
     tax_rate: input.taxRate ?? 100,
     is_synced: 0,
     sync_attempts: 0,
@@ -155,6 +159,8 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
         type: 'TAX_PAYMENT',
         amount: taxHostage,
         status: 'CLEARED',
+        category: 'Tax Payment',
+        note: undefined,
         taxRate: 100,
       },
       now,

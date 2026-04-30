@@ -70,6 +70,8 @@ export const migrateTransactionsToV120 = mutation({
         type,
         amount,
         status,
+        category: typeof legacy.category === 'string' ? legacy.category : undefined,
+        note: typeof legacy.note === 'string' ? legacy.note : undefined,
         taxRate: typeof legacy.taxRate === 'number' ? legacy.taxRate : 100,
         createdAt,
         updatedAt,
@@ -82,6 +84,42 @@ export const migrateTransactionsToV120 = mutation({
       scanned,
       migrated,
       remainingHint: scanned === limit,
+    };
+  },
+});
+
+export const backfillTransactionMetadata = mutation({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.min(Math.max(args.limit ?? 500, 1), 2000);
+    const rows = await ctx.db.query('transactions').take(limit);
+
+    let updated = 0;
+    for (const row of rows) {
+      const category =
+        row.category ??
+        (row.type === 'SUBSCRIPTION'
+          ? 'Subscription'
+          : row.type === 'INCOME'
+            ? 'Income'
+            : row.type === 'TAX_PAYMENT'
+              ? 'Tax Payment'
+              : 'Expense');
+
+      if (row.category === category) {
+        continue;
+      }
+
+      await ctx.db.patch(row._id, { category });
+      updated += 1;
+    }
+
+    return {
+      scanned: rows.length,
+      updated,
+      remainingHint: rows.length === limit,
     };
   },
 });

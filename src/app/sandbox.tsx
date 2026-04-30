@@ -81,6 +81,8 @@ export default function SandboxScreen() {
             type: "EXPENSE",
             amount: item.cost,
             status: "CLEARED",
+            category: "Sandbox",
+            note: item.name,
             taxRate: 100,
           }),
         ),

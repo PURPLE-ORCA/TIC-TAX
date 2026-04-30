@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS transactions (
   type TEXT CHECK(type IN ('INCOME', 'EXPENSE', 'TAX_PAYMENT', 'SUBSCRIPTION')),
   amount INTEGER,
   status TEXT CHECK(status IN ('PENDING', 'CLEARED', 'ACTIVE', 'CANCELLED')),
+  category TEXT,
+  note TEXT,
   tax_rate INTEGER DEFAULT 100,
   is_synced INTEGER DEFAULT 0,
   sync_attempts INTEGER DEFAULT 0,
@@ -57,6 +59,11 @@ Required fields:
 - `type: 'INCOME' | 'EXPENSE' | 'TAX_PAYMENT' | 'SUBSCRIPTION'`
 - `amount: number` (cents)
 - `status: 'PENDING' | 'CLEARED' | 'ACTIVE' | 'CANCELLED'`
+- `category?: string`
+- `note?: string`
+- `taxAmount?: number`
+- `taxCleared?: boolean`
+- `timestamp?: number`
 - `taxRate: number`
 - `createdAt: number`
 - `updatedAt: number`
@@ -106,12 +113,15 @@ Triggers:
 - Success -> mark local `is_synced = 1`.
 - Failure -> increment `sync_attempts`.
 - Permanent validation failure -> set `last_error`.
+- Category and note metadata are pushed with every transaction payload.
 
 ### Pull phase
 
-- Read `lastPullTimestamp` from SecureStore.
+- Bootstrap pull runs with `since = 0` (full pull) to repair/seed local metadata.
+- After bootstrap, read `lastPullTimestamp` from SecureStore.
 - Query Convex: `transactions.listTransactionsSince({ since, limit })`.
-- Skip rows with `clientUuid` already in local SQLite.
+- Skip pending unsynced local rows to avoid stomping optimistic writes.
+- Existing local rows are metadata-repaired from cloud (`category`/`note`) when local values are generic or missing.
 - Upsert new rows into SQLite with `is_synced = 1`.
 - Update `lastPullTimestamp`.
 
@@ -136,11 +146,18 @@ Transforms:
 - `OUT -> EXPENSE`
 - float `amount` -> integer cents
 - fill missing `clientUuid`, `createdAt`, `updatedAt`, `taxRate`, `status`
+- preserve and backfill presentation metadata (`category`, `note`)
 
 Run in batches until complete:
 
 ```bash
 bunx convex run migrations:migrateTransactionsToV120 '{"limit":500}'
+```
+
+Metadata backfill (safe, non-destructive):
+
+```bash
+bunx convex run migrations:backfillTransactionMetadata '{"limit":500}'
 ```
 
 ---

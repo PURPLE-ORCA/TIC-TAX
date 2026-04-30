@@ -5,11 +5,14 @@ import {
   getPendingSyncTransactions,
   markTransactionSynced,
   markTransactionSyncFailure,
-  selectAllTransactionIds,
+  selectPendingSyncTransactionIds,
   upsertTransaction,
+  updateTransactionPresentation,
 } from '@/src/lib/ledger/repository';
 import {
+  hasCompletedFullPullPreference,
   getLastPullTimestampPreference,
+  setCompletedFullPullPreference,
   setLastPullTimestampPreference,
 } from '@/src/lib/storage/preferences';
 import { registerLedgerSyncTrigger, useLedgerStore } from '@/src/store/useLedgerStore';
@@ -34,6 +37,8 @@ async function syncTransaction(row: LedgerTransactionRow): Promise<void> {
     type: row.type,
     amount: row.amount,
     status: row.status,
+    category: row.category ?? undefined,
+    note: row.note ?? undefined,
     taxRate: row.tax_rate,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -48,8 +53,9 @@ async function syncTransaction(row: LedgerTransactionRow): Promise<void> {
   await markTransactionSynced(row.id);
 }
 
-export async function pullFromConvex(): Promise<void> {
-  const since = await getLastPullTimestampPreference();
+export async function pullFromConvex(forceFull = false): Promise<void> {
+  const hasCompletedFullPull = await hasCompletedFullPullPreference();
+  const since = forceFull || !hasCompletedFullPull ? 0 : await getLastPullTimestampPreference();
   const remoteRows = await convexClient.query(api.transactions.listTransactionsSince, {
     since,
     limit: 500,
@@ -59,7 +65,9 @@ export async function pullFromConvex(): Promise<void> {
     return;
   }
 
-  const localIds = await selectAllTransactionIds();
+  const pendingLocalIds = await selectPendingSyncTransactionIds();
+  const localRows = useLedgerStore.getState().transactions;
+  const localById = new Map(localRows.map((row) => [row.id, row]));
   let maxTimestamp = since;
 
   for (const remoteRow of remoteRows) {
@@ -79,7 +87,27 @@ export async function pullFromConvex(): Promise<void> {
       maxTimestamp = createdAt;
     }
 
-    if (localIds.has(clientUuid)) {
+    if (pendingLocalIds.has(clientUuid)) {
+      continue;
+    }
+
+    const existingLocal = localById.get(clientUuid);
+    if (existingLocal) {
+      const shouldPatchCategory =
+        !!remoteRow.category &&
+        (!existingLocal.category ||
+          existingLocal.category === 'Ledger' ||
+          existingLocal.category === 'Expense' ||
+          existingLocal.category === 'Income');
+      const shouldPatchNote = !!remoteRow.note && !existingLocal.note;
+
+      if (shouldPatchCategory || shouldPatchNote) {
+        await updateTransactionPresentation(
+          clientUuid,
+          shouldPatchCategory ? (remoteRow.category ?? null) : null,
+          shouldPatchNote ? (remoteRow.note ?? null) : null,
+        );
+      }
       continue;
     }
 
@@ -88,6 +116,8 @@ export async function pullFromConvex(): Promise<void> {
       type: remoteRow.type,
       amount,
       status,
+      category: remoteRow.category ?? null,
+      note: remoteRow.note ?? null,
       tax_rate: taxRate,
       is_synced: 1,
       sync_attempts: 0,
@@ -95,6 +125,10 @@ export async function pullFromConvex(): Promise<void> {
       created_at: createdAt,
       updated_at: updatedAt,
     });
+  }
+
+  if (forceFull || !hasCompletedFullPull) {
+    await setCompletedFullPullPreference(true);
   }
 
   await setLastPullTimestampPreference(maxTimestamp);
@@ -107,8 +141,9 @@ export async function bootstrapLedgerFromConvex(): Promise<void> {
       return;
     }
 
-    await pullFromConvex();
-  } catch {
+    await pullFromConvex(true);
+  } catch (error) {
+    console.error('Bootstrap pull failed:', error);
     return;
   }
 }

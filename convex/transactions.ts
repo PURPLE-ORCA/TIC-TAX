@@ -23,6 +23,8 @@ async function insertIfMissingByClientUuid(
     type: 'INCOME' | 'EXPENSE' | 'TAX_PAYMENT' | 'SUBSCRIPTION';
     amount: number;
     status: 'PENDING' | 'CLEARED' | 'ACTIVE' | 'CANCELLED';
+    category?: string;
+    note?: string;
     taxRate: number;
     createdAt: number;
     updatedAt: number;
@@ -37,11 +39,21 @@ async function insertIfMissingByClientUuid(
     return { ok: true as const, duplicate: true as const, id: existing._id };
   }
 
+  const taxAmount =
+    input.type === 'INCOME' && input.status === 'CLEARED'
+      ? Math.trunc((input.amount * input.taxRate) / 10000)
+      : 0;
+
   const id = await ctx.db.insert('transactions', {
     clientUuid: input.clientUuid,
     type: input.type,
     amount: input.amount,
     status: input.status,
+    category: input.category,
+    note: input.note,
+    taxAmount,
+    taxCleared: input.type === 'INCOME' && input.status === 'CLEARED' ? false : undefined,
+    timestamp: input.createdAt,
     taxRate: input.taxRate,
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
@@ -56,6 +68,8 @@ export const addTransaction = mutation({
     type: transactionTypeValidator,
     amount: v.number(),
     status: transactionStatusValidator,
+    category: v.optional(v.string()),
+    note: v.optional(v.string()),
     taxRate: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -66,6 +80,8 @@ export const addTransaction = mutation({
       type: args.type,
       amount: args.amount,
       status: args.status,
+      category: args.category,
+      note: args.note,
       taxRate: args.taxRate ?? 100,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
@@ -92,6 +108,8 @@ export const logTransaction = mutation({
       type: mappedType,
       amount: Math.round(args.amount * 100),
       status: mappedStatus,
+      category: args.category,
+      note: args.note,
       taxRate: 100,
       createdAt: now,
       updatedAt: now,
@@ -121,6 +139,12 @@ export const updateTransactionStatus = mutation({
 
     await ctx.db.patch(existing._id, {
       status: args.status,
+      taxAmount:
+        existing.type === 'INCOME' && args.status === 'CLEARED'
+          ? Math.trunc((existing.amount * existing.taxRate) / 10000)
+          : existing.taxAmount,
+      taxCleared:
+        existing.type === 'INCOME' && args.status === 'CLEARED' ? false : existing.taxCleared,
       updatedAt: args.updatedAt,
     });
 
@@ -157,6 +181,8 @@ export const clearInvoice = mutation({
 
     await ctx.db.patch(args.id, {
       status: 'CLEARED',
+      taxAmount: Math.trunc((transaction.amount * transaction.taxRate) / 10000),
+      taxCleared: false,
       updatedAt: Date.now(),
     });
     return { ok: true };
@@ -172,6 +198,7 @@ export const markTaxesPaid = mutation({
       type: 'TAX_PAYMENT',
       amount: 0,
       status: 'CLEARED',
+      category: 'Tax Payment',
       taxRate: 100,
       createdAt: now,
       updatedAt: now,
@@ -233,8 +260,16 @@ export const getDashboardStats = query({
     }> = recentRows.map((row) => ({
       _id: row._id,
       amount: row.amount / 100,
-      category: row.type === 'SUBSCRIPTION' ? 'Subscription' : 'Ledger',
-      note: undefined,
+      category:
+        row.category ??
+        (row.type === 'SUBSCRIPTION'
+          ? 'Subscription'
+          : row.type === 'INCOME'
+            ? 'Income'
+            : row.type === 'TAX_PAYMENT'
+              ? 'Tax Payment'
+              : 'Expense'),
+      note: row.note,
       type: row.type === 'INCOME' ? 'IN' : 'OUT',
       status: row.status === 'PENDING' ? 'PENDING' : 'CLEARED',
     }));
@@ -269,6 +304,8 @@ export const listTransactionsSince = query({
       type: row.type,
       amount: row.amount,
       status: row.status,
+      category: row.category,
+      note: row.note,
       taxRate: row.taxRate,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

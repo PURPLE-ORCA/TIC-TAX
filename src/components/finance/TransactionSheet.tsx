@@ -45,6 +45,8 @@ export function TransactionSheet({
         amount: amountCents,
         type: type === "IN" ? "INCOME" : "EXPENSE",
         status: type === "IN" && isPending ? "PENDING" : "CLEARED",
+        category: type === "IN" ? "Income" : category,
+        note: note.trim() || undefined,
         taxRate: 100,
       });
       setAmount("");
