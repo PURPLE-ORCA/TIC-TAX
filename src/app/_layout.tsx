@@ -14,6 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { Uniwind } from "uniwind";
 import { useEffect } from "react";
+import { initLedgerDatabase } from "@/src/lib/ledger/sqlite";
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 
@@ -36,6 +37,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   useEffect(() => {
     Uniwind.setTheme("dark");
+    void initLedgerDatabase();
 
     if (Platform.OS === "android") {
       NavigationBar.setStyle("dark");
