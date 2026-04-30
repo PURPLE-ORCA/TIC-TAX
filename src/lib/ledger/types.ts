@@ -15,6 +15,8 @@ export type LedgerTransactionRow = {
   type: LedgerTransactionType;
   amount: number;
   status: LedgerTransactionStatus;
+  category: string | null;
+  note: string | null;
   tax_rate: number;
   is_synced: number;
   sync_attempts: number;
