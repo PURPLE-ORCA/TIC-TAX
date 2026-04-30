@@ -45,6 +45,33 @@ export async function insertTransaction(row: LedgerTransactionRow): Promise<void
   );
 }
 
+export async function upsertTransaction(row: LedgerTransactionRow): Promise<void> {
+  const db = getLedgerDatabase();
+  await db.runAsync(
+    `INSERT OR REPLACE INTO transactions (
+      id, type, amount, status, tax_rate, is_synced, sync_attempts, last_error, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      row.id,
+      row.type,
+      row.amount,
+      row.status,
+      row.tax_rate,
+      row.is_synced,
+      row.sync_attempts,
+      row.last_error,
+      row.created_at,
+      row.updated_at,
+    ],
+  );
+}
+
+export async function selectAllTransactionIds(): Promise<Set<string>> {
+  const db = getLedgerDatabase();
+  const rows = await db.getAllAsync<{ id: string }>('SELECT id FROM transactions');
+  return new Set(rows.map((row) => row.id));
+}
+
 export async function updateTransactionStatus(
   id: string,
   status: LedgerTransactionRow['status'],

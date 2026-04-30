@@ -250,3 +250,28 @@ export const getDashboardStats = query({
     };
   },
 });
+
+export const listTransactionsSince = query({
+  args: {
+    since: v.number(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.min(Math.max(args.limit ?? 500, 1), 1000);
+    const rows = await ctx.db
+      .query('transactions')
+      .withIndex('by_createdAt', (q) => q.gt('createdAt', args.since))
+      .order('asc')
+      .take(limit);
+
+    return rows.map((row) => ({
+      clientUuid: row.clientUuid,
+      type: row.type,
+      amount: row.amount,
+      status: row.status,
+      taxRate: row.taxRate,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }));
+  },
+});
