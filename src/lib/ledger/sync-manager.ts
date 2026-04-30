@@ -70,25 +70,37 @@ export async function pullFromConvex(): Promise<void> {
   let maxTimestamp = since;
 
   for (const remoteRow of remoteRows) {
-    if (remoteRow.createdAt > maxTimestamp) {
-      maxTimestamp = remoteRow.createdAt;
+    const clientUuid = remoteRow.clientUuid;
+    const createdAt = remoteRow.createdAt;
+    const taxRate = remoteRow.taxRate ?? 100;
+    const status = remoteRow.status ?? 'CLEARED';
+    const amount = remoteRow.amount ?? 0;
+
+    if (!clientUuid || createdAt == null) {
+      continue;
     }
 
-    if (localIds.has(remoteRow.clientUuid)) {
+    const updatedAt = remoteRow.updatedAt ?? createdAt;
+
+    if (createdAt > maxTimestamp) {
+      maxTimestamp = createdAt;
+    }
+
+    if (localIds.has(clientUuid)) {
       continue;
     }
 
     await upsertTransaction({
-      id: remoteRow.clientUuid,
+      id: clientUuid,
       type: remoteRow.type,
-      amount: remoteRow.amount,
-      status: remoteRow.status,
-      tax_rate: remoteRow.taxRate,
+      amount,
+      status,
+      tax_rate: taxRate,
       is_synced: 1,
       sync_attempts: 0,
       last_error: null,
-      created_at: remoteRow.createdAt,
-      updated_at: remoteRow.updatedAt,
+      created_at: createdAt,
+      updated_at: updatedAt,
     });
   }
 
