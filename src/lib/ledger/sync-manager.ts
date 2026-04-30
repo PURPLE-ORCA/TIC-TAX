@@ -8,14 +8,16 @@ import {
   selectAllTransactionIds,
   upsertTransaction,
 } from '@/src/lib/ledger/repository';
-import { appPreferencesStorage } from '@/src/lib/storage/mmkv';
+import {
+  getLastPullTimestampPreference,
+  setLastPullTimestampPreference,
+} from '@/src/lib/storage/preferences';
 import { registerLedgerSyncTrigger, useLedgerStore } from '@/src/store/useLedgerStore';
 import type { LedgerTransactionRow } from '@/src/lib/ledger/types';
 import { AppState } from 'react-native';
 
 let isSyncing = false;
 let isInitialized = false;
-const LAST_PULL_TIMESTAMP_KEY = 'ledger.lastPullTimestamp';
 
 function isPermanentSyncError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
@@ -46,17 +48,8 @@ async function syncTransaction(row: LedgerTransactionRow): Promise<void> {
   await markTransactionSynced(row.id);
 }
 
-function getLastPullTimestamp(): number {
-  const value = appPreferencesStorage.getNumber(LAST_PULL_TIMESTAMP_KEY);
-  return typeof value === 'number' ? value : 0;
-}
-
-function setLastPullTimestamp(timestamp: number): void {
-  appPreferencesStorage.set(LAST_PULL_TIMESTAMP_KEY, timestamp);
-}
-
 export async function pullFromConvex(): Promise<void> {
-  const since = getLastPullTimestamp();
+  const since = await getLastPullTimestampPreference();
   const remoteRows = await convexClient.query(api.transactions.listTransactionsSince, {
     since,
     limit: 500,
@@ -104,7 +97,7 @@ export async function pullFromConvex(): Promise<void> {
     });
   }
 
-  setLastPullTimestamp(maxTimestamp);
+  await setLastPullTimestampPreference(maxTimestamp);
 }
 
 export async function bootstrapLedgerFromConvex(): Promise<void> {
