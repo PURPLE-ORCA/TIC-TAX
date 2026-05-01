@@ -1,10 +1,10 @@
-import { api } from "@/convex/_generated/api";
 import { CATEGORIES } from "@/src/components/screens/home/constants";
 import { RenderIf } from "@/src/components/helpers/render-if";
 import { Show } from "@/src/components/helpers/show";
+import { toCents } from "@/src/lib/ledger/money";
+import { useLedgerStore } from "@/src/store/useLedgerStore";
 import { Text } from "@/src/components/ui/text";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { useMutation } from "convex/react";
 import {
   BottomSheet,
   Button,
@@ -33,26 +33,44 @@ export function TransactionSheet({
   const [category, setCategory] = useState("Junk");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const logTransaction = useMutation(api.transactions.logTransaction);
+  const addTransaction = useLedgerStore((state) => state.addTransaction);
 
   const handleSubmit = async () => {
-    const numAmount = Number.parseFloat(amount);
-    if (Number.isNaN(numAmount) || numAmount <= 0) return;
+    const amountCents = toCents(amount);
+    if (__DEV__) {
+      console.log('[tx-sheet] submit:start', {
+        rawAmount: amount,
+        parsedCents: amountCents,
+        type,
+        isPending,
+        category,
+        noteLength: note.trim().length,
+      });
+    }
+
+    if (amountCents <= 0) return;
 
     setIsSubmitting(true);
     try {
-      await logTransaction({
-        amount: numAmount,
-        type,
+      await addTransaction({
+        amount: amountCents,
+        type: type === "IN" ? "INCOME" : "EXPENSE",
         status: type === "IN" && isPending ? "PENDING" : "CLEARED",
         category: type === "IN" ? "Income" : category,
         note: note.trim() || undefined,
+        taxRate: 100,
       });
+      if (__DEV__) {
+        console.log('[tx-sheet] submit:success');
+      }
       setAmount("");
       setNote("");
       setIsPending(false);
       onOpenChange(false);
     } catch (error) {
+      if (__DEV__) {
+        console.error('[tx-sheet] submit:error', error);
+      }
       console.error("Failed to log transaction:", error);
     } finally {
       setIsSubmitting(false);
