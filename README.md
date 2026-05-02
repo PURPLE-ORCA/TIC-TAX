@@ -1,76 +1,140 @@
-# TIC-TAX ⏳🩸
+# TIC-TAX v1.2.0 ⏳🩸
 
-> A brutalist, survival-focused financial ledger a 20yo freelancers.
+> A brutalist, offline-first financial ledger for freelancers who enjoy survival math more than corporate fluff.
 
-Most finance trackers are bloated SaaS wrappers built for salaried employees. They show you pie charts of your coffee habits but ignore the reality of freelance life: volatile income, silent SaaS subscriptions, and quarterly tax shakedowns.
+TIC-TAX is a mobile app for tracking cash flow, quarantining taxes, managing recurring burn, and calculating how long you can keep pretending your “freelance lifestyle” is sustainable.
 
-**TIC-TAX** is an open-source mobile app designed to track your runway, quarantine your taxes, and aggressively remind you of your opportunity costs. 
+Version `1.2.0` is the big one:
 
-No charts. No generic advice. Just the cold, hard numbers.
+- SQLite-first ledger with idempotent Convex sync
+- Runway tab for recurring costs and survival clock
+- Long-press deletion flows for transactions and subscriptions
+- Tax Hostage reset flow for cleared taxes
+- Android edge-to-edge and keyboard handling fixes
+
+No charts for the sake of charts. No SaaS nonsense. Just the numbers that matter.
 
 ## Core Philosophy
 
-* **The 3-Second Loop:** If logging a taxi ride takes more than three seconds, the UI failed. 
-* **Time > Money:** Every expense is calculated in terms of "Days of Survival Lost."
-* **Zero Phantom Capital:** Pending invoices do not inflate your usable balance.
-* **Total Sovereignty:** Your data lives in your own Convex database, not a third-party server.
+- The 3-second loop matters. If logging takes longer, the UI failed.
+- Time is the real currency. Every expense should tell you how much life it burns.
+- Taxes are not “available balance.” Pending invoices are not cash. Reality wins.
+- Your ledger should work offline first, then sync when the network stops being dramatic.
+- JS-thread abuse is a crime. Keep the UI native, fast, and boring where it needs to be.
+
+
+### Offline-First Ledger
+
+- Transactions now live in local SQLite as the source of truth.
+- Writes are optimistic locally, then synced to Convex with UUID-based idempotency.
+- The app flushes pending syncs when the app foregrounds or the network comes back.
+- Remote rows are pulled back into the local ledger so another device does not get to gaslight you.
+
+### Runway Tab
+
+- Added recurring subscriptions to model monthly burn.
+- Added the Survival Clock to calculate runway in months.
+- Critical runway state highlights the problem in red instead of politely suggesting it.
+
+### Deletion and Tax Controls
+
+- Long-press deletion is wired for transactions and subscriptions.
+- Tax Hostage can be reset once taxes are marked as paid.
+- No swipey nonsense, no accidental taps, no nonsense “are you sure?” theater beyond native alerts.
+
+### Android Stability
+
+- Edge-to-edge safe-area handling is fixed for modern Android.
+- Android nav bar styling is configured natively.
+- Bottom sheet inputs use `BottomSheetTextInput` so the keyboard behaves like it should have in the first place.
 
 ## Tech Stack
 
-* **Framework:** [Expo](https://expo.dev/) / React Native
-* **Backend & State:** [Convex](https://www.convex.dev/) (Real-time sync, local-first logic)
-* **Styling:** [Uniwind](https://uniwind.dev/) (Tailwind for React Native)
-* **UI Components:** [Gorhom Bottom Sheet](https://gorhom.github.io/react-native-bottom-sheet/), [HeroUI](https://heroui.com/) (Dialogs)
-* **Package Manager:** [Bun](https://bun.sh/)
+- [Expo](https://expo.dev/) / React Native 0.83
+- [Expo Router](https://docs.expo.dev/router/introduction/)
+- [Convex](https://www.convex.dev/) for backend, sync, and realtime data
+- SQLite for offline local ledger storage
+- [Uniwind](https://uniwind.dev/) for styling
+- [HeroUI Native](https://heroui.com/) for UI primitives
+- [Reanimated](https://docs.swmansion.com/react-native-reanimated/) for motion
+- [Bun](https://bun.sh/) as the package manager
 
 ## Key Features
 
-### 1. The Pulse (Real-Time Ledger)
-Your daily reality check. Automatically intercepts every unit of income, slices off your exact tax bracket (configurable, defaults to 1%), and locks it in the **Tax Hostage** vault. You only ever see your actual `Safe to Spend` capital.
+### 1. The Pulse
 
-### 2. The Runway (Survival Clock)
-Calculates your absolute fixed monthly costs ("Continious Bleed"). It takes your Safe Capital and divides it by your Burn Rate to give you a ruthless countdown: *Exactly how many months until you go broke if you stop working today.*
+Your main ledger. Tracks income, expenses, tax withholding, and the actual safe-to-spend balance. It is the app’s rude little accountant.
 
-### 3. The Waiting Room (Accounts Receivable)
-Invoices sent are not cash in hand. Log incoming money as `PENDING`. It mocks you from the dashboard until the client actually pays, ensuring you never forget to follow up, while keeping your active budget strictly accurate.
+### 2. The Runway
 
-### 4. The Regret Sandbox (Opportunity Cost Simulator)
-A client-side simulator. Before you buy a 300 MAD mechanical keyboard, add it to the sandbox. It instantly calculates how many days of runway that purchase will destroy, and exactly how much new gross income you need to invoice to recover the cost.
+Models recurring monthly burn and calculates how many months of survival you have left. It shows monthly burn, safe capital, and a survival clock that gets ugly when the math gets ugly.
 
-## Getting Started (Local Development)
+### 3. The Waiting Room
 
-You don't need to pay for cloud hosting to use this. You can run the entire backend locally.
+Tracks pending income separately from real cash so invoices do not magically become spendable money just because you feel optimistic.
 
-**1. Clone the repository**
+### 4. The Regret Sandbox
+
+Lets you simulate a purchase before you do something expensive and stupid. It tells you how many days of survival the item costs and how much income you need to recover it.
+
+## Getting Started
+
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/PURPLE-ORCA/TIC-TAX.git
 cd tic-tax
 ```
 
-**2. Install dependencies (Bun recommended)**
+### 2. Install dependencies
+
 ```bash
 bun install
 ```
 
-**3. Start the Convex Backend**
-This will start your local database on port `3210`.
+### 3. Start the app
+
 ```bash
-bunx convex dev
+bun run dev
 ```
 
-**4. Run the Expo App**
-In a new terminal window:
+If you want platform-specific runs:
+
 ```bash
-bun dev
+bun run android
+bun run ios
+```
+
+## Architecture Notes
+
+- `SQLite` is the local source of truth.
+- `Convex` handles sync, realtime updates, and cloud persistence.
+- `expo-secure-store` is used for sensitive persistence.
+- Expo Router owns navigation. No custom router circus.
+- Bottom sheets, navigation bar handling, and safe-area insets are configured for modern Android behavior.
+
+## Development Commands
+
+```bash
+bun run dev
+bun run android
+bun run ios
+bun run lint
+bun run lint:fix
+bun run format
+bun run format:check
+bun run typecheck
 ```
 
 ## Contributing
 
-This app was built for brutal efficiency. If you want to contribute, adhere to the following rules:
-1.  **Keep it native and fast.** No heavy animation libraries if a simple transition will do.
-2.  **No bloated state management.** Convex handles the data layer. We don't need Redux for a 3-screen app.
-3.  **UI is secondary to UX.** If a new feature adds friction to the 3-second data entry loop, it gets rejected.
+Keep contributions aligned with the app’s actual job:
+
+- Keep the ledger fast.
+- Keep the sync logic deterministic.
+- Keep UI friction low.
+- Do not reintroduce state management theater or JS-thread animations just to feel productive.
 
 ## License
 
-MIT License. Do whatever you want with it, just don't blame me when the Survival Clock hits zero.
+MIT License. Use it, fork it, break it, just do not blame the app when your runway hits zero.
