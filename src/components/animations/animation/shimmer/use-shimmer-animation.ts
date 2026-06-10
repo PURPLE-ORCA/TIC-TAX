@@ -9,8 +9,8 @@ import {
   type WithTimingConfig,
   type WithSpringConfig,
   useDerivedValue,
-} from 'react-native-reanimated';
-import type { UseShimmerAnimationConfig } from './types';
+} from "react-native-reanimated";
+import type { UseShimmerAnimationConfig } from "./types";
 
 /**
  * Drives shimmer animation: builds the repeat/delay sequence,
@@ -33,9 +33,10 @@ export const useShimmerAnimation = (config: UseShimmerAnimationConfig) => {
   } = config;
 
   // Resolve animation params — animation.config takes precedence over duration shorthand
-  const animationType = animation?.type ?? 'timing';
+  const animationType = animation?.type ?? "timing";
   const defaultDuration = duration ?? 2000;
-  const animationConfig = animation?.config ?? ({ duration: defaultDuration } as WithTimingConfig);
+  const animationConfig =
+    animation?.config ?? ({ duration: defaultDuration } as WithTimingConfig);
   const numberOfReps = animation?.numberOfReps ?? -1;
   const reverse = animation?.reverse ?? false;
 
@@ -54,7 +55,7 @@ export const useShimmerAnimation = (config: UseShimmerAnimationConfig) => {
       progress.set(0);
 
       const animateToEnd =
-        animationType === 'spring'
+        animationType === "spring"
           ? withSpring(1, animationConfig as WithSpringConfig)
           : withTiming(1, animationConfig as WithTimingConfig);
 
@@ -64,7 +65,7 @@ export const useShimmerAnimation = (config: UseShimmerAnimationConfig) => {
         // Ping-pong: 0→1→0. Manual round-trip because withRepeat's built-in
         // reverse doesn't compose correctly with withSequence.
         const animateBack =
-          animationType === 'spring'
+          animationType === "spring"
             ? withSpring(0, animationConfig as WithSpringConfig)
             : withTiming(0, animationConfig as WithTimingConfig);
 
@@ -82,14 +83,19 @@ export const useShimmerAnimation = (config: UseShimmerAnimationConfig) => {
         // Default: 0→1, snap to 0, repeat
         const animationSequence =
           repeatDelay > 0
-            ? withSequence(animateToEnd, withDelay(repeatDelay, withTiming(0, { duration: 0 })))
+            ? withSequence(
+                animateToEnd,
+                withDelay(repeatDelay, withTiming(0, { duration: 0 })),
+              )
             : withSequence(animateToEnd, withTiming(0, { duration: 0 }));
 
         repeatedAnimation = withRepeat(animationSequence, numberOfReps, false);
       }
 
       progress.set(
-        initialDelay > 0 ? withDelay(initialDelay, repeatedAnimation) : repeatedAnimation,
+        initialDelay > 0
+          ? withDelay(initialDelay, repeatedAnimation)
+          : repeatedAnimation,
       );
     },
   );
@@ -145,13 +151,14 @@ export const useShimmerAnimation = (config: UseShimmerAnimationConfig) => {
     const effectiveWidth = translateContainerWidth.get();
     const startPosition = -effectiveWidth;
     const endPosition = trackDistance.get();
-    const translateXValue = startPosition + progress.get() * (endPosition - startPosition);
+    const translateXValue =
+      startPosition + progress.get() * (endPosition - startPosition);
 
     return {
       opacity: 1,
       width: translateContainerWidth.get(),
       height: translateContainerHeight.get(),
-      transform: [{ translateX: translateXValue }, { translateY: '-50%' }],
+      transform: [{ translateX: translateXValue }, { translateY: "-50%" }],
     };
   });
 

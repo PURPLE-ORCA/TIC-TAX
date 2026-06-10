@@ -26,7 +26,8 @@ export interface RecentActivitySectionProps<
 }
 
 function getTransactionIcon(tx: RecentActivityTransaction) {
-  const name = CATEGORY_ICONS[tx.category as keyof typeof CATEGORY_ICONS] ?? "help-circle";
+  const name =
+    CATEGORY_ICONS[tx.category as keyof typeof CATEGORY_ICONS] ?? "help-circle";
 
   if (tx.type === "IN" && tx.status === "PENDING") {
     return { name, color: "#fbbf24" };

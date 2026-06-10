@@ -1,5 +1,5 @@
-import { Text as RNText, type TextProps as RNTextProps } from 'react-native';
-import { tv, type VariantProps } from 'tailwind-variants';
+import { Text as RNText, type TextProps as RNTextProps } from "react-native";
+import { tv, type VariantProps } from "tailwind-variants";
 
 const text = tv({
   base: "text-left",

@@ -1,14 +1,14 @@
 export type LedgerTransactionType =
-  | 'INCOME'
-  | 'EXPENSE'
-  | 'TAX_PAYMENT'
-  | 'SUBSCRIPTION';
+  | "INCOME"
+  | "EXPENSE"
+  | "TAX_PAYMENT"
+  | "SUBSCRIPTION";
 
 export type LedgerTransactionStatus =
-  | 'PENDING'
-  | 'CLEARED'
-  | 'ACTIVE'
-  | 'CANCELLED';
+  | "PENDING"
+  | "CLEARED"
+  | "ACTIVE"
+  | "CANCELLED";
 
 export type LedgerTransactionRow = {
   id: string;

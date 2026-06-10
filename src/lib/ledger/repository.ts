@@ -1,12 +1,12 @@
-import { getLedgerDatabase } from '@/src/lib/ledger/sqlite';
-import type { LedgerTransactionRow } from '@/src/lib/ledger/types';
+import { getLedgerDatabase } from "@/src/lib/ledger/sqlite";
+import type { LedgerTransactionRow } from "@/src/lib/ledger/types";
 
 function mapRow(row: Record<string, unknown>): LedgerTransactionRow {
   return {
     id: String(row.id),
-    type: row.type as LedgerTransactionRow['type'],
+    type: row.type as LedgerTransactionRow["type"],
     amount: Number(row.amount),
-    status: row.status as LedgerTransactionRow['status'],
+    status: row.status as LedgerTransactionRow["status"],
     category: row.category ? String(row.category) : null,
     note: row.note ? String(row.note) : null,
     tax_rate: Number(row.tax_rate),
@@ -21,15 +21,17 @@ function mapRow(row: Record<string, unknown>): LedgerTransactionRow {
 export async function selectAllTransactions(): Promise<LedgerTransactionRow[]> {
   const db = getLedgerDatabase();
   const rows = await db.getAllAsync<Record<string, unknown>>(
-    'SELECT * FROM transactions ORDER BY created_at DESC',
+    "SELECT * FROM transactions ORDER BY created_at DESC",
   );
   return rows.map(mapRow);
 }
 
-export async function insertTransaction(row: LedgerTransactionRow): Promise<void> {
+export async function insertTransaction(
+  row: LedgerTransactionRow,
+): Promise<void> {
   const db = getLedgerDatabase();
   if (__DEV__) {
-    console.log('[ledger-repo] insert:start', {
+    console.log("[ledger-repo] insert:start", {
       id: row.id,
       amount: row.amount,
       type: row.type,
@@ -56,11 +58,13 @@ export async function insertTransaction(row: LedgerTransactionRow): Promise<void
     ],
   );
   if (__DEV__) {
-    console.log('[ledger-repo] insert:ok', { id: row.id });
+    console.log("[ledger-repo] insert:ok", { id: row.id });
   }
 }
 
-export async function upsertTransaction(row: LedgerTransactionRow): Promise<void> {
+export async function upsertTransaction(
+  row: LedgerTransactionRow,
+): Promise<void> {
   const db = getLedgerDatabase();
   await db.runAsync(
     `INSERT OR REPLACE INTO transactions (
@@ -85,14 +89,16 @@ export async function upsertTransaction(row: LedgerTransactionRow): Promise<void
 
 export async function selectAllTransactionIds(): Promise<Set<string>> {
   const db = getLedgerDatabase();
-  const rows = await db.getAllAsync<{ id: string }>('SELECT id FROM transactions');
+  const rows = await db.getAllAsync<{ id: string }>(
+    "SELECT id FROM transactions",
+  );
   return new Set(rows.map((row) => row.id));
 }
 
 export async function selectPendingSyncTransactionIds(): Promise<Set<string>> {
   const db = getLedgerDatabase();
   const rows = await db.getAllAsync<{ id: string }>(
-    'SELECT id FROM transactions WHERE is_synced = 0',
+    "SELECT id FROM transactions WHERE is_synced = 0",
   );
   return new Set(rows.map((row) => row.id));
 }
@@ -114,7 +120,7 @@ export async function updateTransactionPresentation(
 
 export async function updateTransactionStatus(
   id: string,
-  status: LedgerTransactionRow['status'],
+  status: LedgerTransactionRow["status"],
   updatedAt: number,
 ): Promise<void> {
   const db = getLedgerDatabase();
@@ -126,10 +132,12 @@ export async function updateTransactionStatus(
   );
 }
 
-export async function getPendingSyncTransactions(): Promise<LedgerTransactionRow[]> {
+export async function getPendingSyncTransactions(): Promise<
+  LedgerTransactionRow[]
+> {
   const db = getLedgerDatabase();
   const rows = await db.getAllAsync<Record<string, unknown>>(
-    'SELECT * FROM transactions WHERE is_synced = 0 ORDER BY created_at ASC',
+    "SELECT * FROM transactions WHERE is_synced = 0 ORDER BY created_at ASC",
   );
   return rows.map(mapRow);
 }
@@ -137,7 +145,7 @@ export async function getPendingSyncTransactions(): Promise<LedgerTransactionRow
 export async function markTransactionSynced(id: string): Promise<void> {
   const db = getLedgerDatabase();
   await db.runAsync(
-    'UPDATE transactions SET is_synced = 1, last_error = NULL WHERE id = ?',
+    "UPDATE transactions SET is_synced = 1, last_error = NULL WHERE id = ?",
     [id],
   );
 }
@@ -159,7 +167,7 @@ export async function markTransactionSyncFailure(
   }
 
   await db.runAsync(
-    'UPDATE transactions SET sync_attempts = sync_attempts + 1 WHERE id = ?',
+    "UPDATE transactions SET sync_attempts = sync_attempts + 1 WHERE id = ?",
     [id],
   );
 }

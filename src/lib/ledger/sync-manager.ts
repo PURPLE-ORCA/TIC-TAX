@@ -1,6 +1,6 @@
-import NetInfo from '@react-native-community/netinfo';
-import { api } from '@/convex/_generated/api';
-import { convexClient } from '@/src/lib/convex/client';
+import NetInfo from "@react-native-community/netinfo";
+import { api } from "@/convex/_generated/api";
+import { convexClient } from "@/src/lib/convex/client";
 import {
   getPendingSyncTransactions,
   markTransactionSynced,
@@ -8,16 +8,19 @@ import {
   selectPendingSyncTransactionIds,
   upsertTransaction,
   updateTransactionPresentation,
-} from '@/src/lib/ledger/repository';
+} from "@/src/lib/ledger/repository";
 import {
   hasCompletedFullPullPreference,
   getLastPullTimestampPreference,
   setCompletedFullPullPreference,
   setLastPullTimestampPreference,
-} from '@/src/lib/storage/preferences';
-import { registerLedgerSyncTrigger, useLedgerStore } from '@/src/store/useLedgerStore';
-import type { LedgerTransactionRow } from '@/src/lib/ledger/types';
-import { AppState } from 'react-native';
+} from "@/src/lib/storage/preferences";
+import {
+  registerLedgerSyncTrigger,
+  useLedgerStore,
+} from "@/src/store/useLedgerStore";
+import type { LedgerTransactionRow } from "@/src/lib/ledger/types";
+import { AppState } from "react-native";
 
 let isSyncing = false;
 let isInitialized = false;
@@ -26,9 +29,9 @@ let shouldRunAgain = false;
 function isPermanentSyncError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return (
-    message.includes('ArgumentValidationError') ||
-    message.includes('ConvexError') ||
-    message.includes('CheckConstraint')
+    message.includes("ArgumentValidationError") ||
+    message.includes("ConvexError") ||
+    message.includes("CheckConstraint")
   );
 }
 
@@ -56,11 +59,17 @@ async function syncTransaction(row: LedgerTransactionRow): Promise<void> {
 
 export async function pullFromConvex(forceFull = false): Promise<void> {
   const hasCompletedFullPull = await hasCompletedFullPullPreference();
-  const since = forceFull || !hasCompletedFullPull ? 0 : await getLastPullTimestampPreference();
-  const remoteRows = await convexClient.query(api.transactions.listTransactionsSince, {
-    since,
-    limit: 500,
-  });
+  const since =
+    forceFull || !hasCompletedFullPull
+      ? 0
+      : await getLastPullTimestampPreference();
+  const remoteRows = await convexClient.query(
+    api.transactions.listTransactionsSince,
+    {
+      since,
+      limit: 500,
+    },
+  );
 
   if (remoteRows.length === 0) {
     if (forceFull || !hasCompletedFullPull) {
@@ -79,7 +88,7 @@ export async function pullFromConvex(forceFull = false): Promise<void> {
     const clientUuid = remoteRow.clientUuid;
     const createdAt = remoteRow.createdAt;
     const taxRate = remoteRow.taxRate ?? 100;
-    const status = remoteRow.status ?? 'CLEARED';
+    const status = remoteRow.status ?? "CLEARED";
     const amount = remoteRow.amount ?? 0;
 
     if (!clientUuid || createdAt == null) {
@@ -101,9 +110,9 @@ export async function pullFromConvex(forceFull = false): Promise<void> {
       const shouldPatchCategory =
         !!remoteRow.category &&
         (!existingLocal.category ||
-          existingLocal.category === 'Ledger' ||
-          existingLocal.category === 'Expense' ||
-          existingLocal.category === 'Income');
+          existingLocal.category === "Ledger" ||
+          existingLocal.category === "Expense" ||
+          existingLocal.category === "Income");
       const shouldPatchNote = !!remoteRow.note && !existingLocal.note;
 
       if (shouldPatchCategory || shouldPatchNote) {
@@ -165,7 +174,7 @@ export async function bootstrapLedgerFromConvex(): Promise<void> {
 
     await pullFromConvex(true);
   } catch (error) {
-    console.error('Bootstrap pull failed:', error);
+    console.error("Bootstrap pull failed:", error);
     return;
   }
 }
@@ -174,7 +183,7 @@ export async function flushLedgerSync(): Promise<void> {
   if (isSyncing) {
     shouldRunAgain = true;
     if (__DEV__) {
-      console.log('[sync] flush:queue already syncing');
+      console.log("[sync] flush:queue already syncing");
     }
     return;
   }
@@ -189,25 +198,30 @@ export async function flushLedgerSync(): Promise<void> {
       }
 
       if (__DEV__) {
-        console.log('[sync] flush:start');
+        console.log("[sync] flush:start");
       }
       const pending = await getPendingSyncTransactions();
 
       if (__DEV__) {
-        console.log('[sync] flush:pending', { count: pending.length });
+        console.log("[sync] flush:pending", { count: pending.length });
       }
 
       for (const row of pending) {
         try {
           await syncTransaction(row);
           if (__DEV__) {
-            console.log('[sync] push:ok', { id: row.id });
+            console.log("[sync] push:ok", { id: row.id });
           }
         } catch (error) {
           const permanent = isPermanentSyncError(error);
-          const message = error instanceof Error ? error.message : String(error);
+          const message =
+            error instanceof Error ? error.message : String(error);
           if (__DEV__) {
-            console.error('[sync] push:error', { id: row.id, permanent, message });
+            console.error("[sync] push:error", {
+              id: row.id,
+              permanent,
+              message,
+            });
           }
           await markTransactionSyncFailure(row.id, message, permanent);
         }
@@ -215,14 +229,14 @@ export async function flushLedgerSync(): Promise<void> {
 
       await pullFromConvex();
       if (__DEV__) {
-        console.log('[sync] pull:ok');
+        console.log("[sync] pull:ok");
       }
     } while (shouldRunAgain);
   } finally {
     isSyncing = false;
     await useLedgerStore.getState().refreshFromDb();
     if (__DEV__) {
-      console.log('[sync] flush:done');
+      console.log("[sync] flush:done");
     }
   }
 }
@@ -237,11 +251,14 @@ export function startLedgerSyncEngine(): void {
     void flushLedgerSync();
   });
 
-  const appStateSubscription = AppState.addEventListener('change', (nextState) => {
-    if (nextState === 'active') {
-      void flushLedgerSync();
-    }
-  });
+  const appStateSubscription = AppState.addEventListener(
+    "change",
+    (nextState) => {
+      if (nextState === "active") {
+        void flushLedgerSync();
+      }
+    },
+  );
 
   const netInfoSubscription = NetInfo.addEventListener((state) => {
     if (state.isConnected && state.isInternetReachable !== false) {

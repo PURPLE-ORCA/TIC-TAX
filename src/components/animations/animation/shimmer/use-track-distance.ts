@@ -1,4 +1,8 @@
-import { useDerivedValue, type DerivedValue, type SharedValue } from 'react-native-reanimated';
+import {
+  useDerivedValue,
+  type DerivedValue,
+  type SharedValue,
+} from "react-native-reanimated";
 
 type UseTrackDistanceParams = {
   containerWidth: SharedValue<number>;
@@ -27,7 +31,10 @@ export const useTrackDistance = ({
     }
 
     const angleRad = (trackAngle * Math.PI) / 180;
-    return containerW * Math.abs(Math.cos(angleRad)) + containerH * Math.abs(Math.sin(angleRad));
+    return (
+      containerW * Math.abs(Math.cos(angleRad)) +
+      containerH * Math.abs(Math.sin(angleRad))
+    );
   });
 
   return trackDistance;

@@ -2,12 +2,12 @@ export function toCents(input: string): number {
   const value = input.trim();
   if (!value) return 0;
 
-  const normalized = value.replace(',', '.');
+  const normalized = value.replace(",", ".");
   if (!/^\d+(\.\d{0,2})?$/.test(normalized)) {
     return 0;
   }
 
-  const [wholePart, decimalPart = ''] = normalized.split('.');
+  const [wholePart, decimalPart = ""] = normalized.split(".");
   const whole = Number.parseInt(wholePart, 10);
   if (Number.isNaN(whole)) {
     return 0;

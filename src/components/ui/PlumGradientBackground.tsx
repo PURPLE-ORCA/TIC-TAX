@@ -1,4 +1,10 @@
-import { Canvas, Circle, Fill, Group, BlurMask } from "@shopify/react-native-skia";
+import {
+  Canvas,
+  Circle,
+  Fill,
+  Group,
+  BlurMask,
+} from "@shopify/react-native-skia";
 import { Dimensions } from "react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -39,7 +45,7 @@ export function PlumGradientBackground() {
         <Circle
           cx={width * 0.5}
           cy={height * 0.25}
-          r={width * 0.80}
+          r={width * 0.8}
           color="#190924"
           opacity={0.3}
         />

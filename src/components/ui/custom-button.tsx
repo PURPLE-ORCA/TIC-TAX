@@ -1,6 +1,6 @@
-import { Button } from 'heroui-native';
-import { Text, View } from 'react-native';
-import { tv, type VariantProps } from 'tailwind-variants';
+import { Button } from "heroui-native";
+import { Text, View } from "react-native";
+import { tv } from "tailwind-variants";
 
 const button = tv({
   base: "h-14 rounded-xl items-center justify-center flex-row",
@@ -17,16 +17,16 @@ const button = tv({
 });
 
 const labelText = tv({
-  base: 'font-bold',
+  base: "font-bold",
   variants: {
     variant: {
-      primary: 'text-white',
-      secondary: 'text-foreground',
-      transparent: 'text-primary',
+      primary: "text-white",
+      secondary: "text-foreground",
+      transparent: "text-primary",
     },
   },
   defaultVariants: {
-    variant: 'primary',
+    variant: "primary",
   },
 });
 
@@ -38,14 +38,20 @@ export type CustomButtonProps = {
   isDisabled?: boolean;
 };
 
-export function CustomButton({ variant = "primary", className, label, onPress, isDisabled }: CustomButtonProps) {
+export function CustomButton({
+  variant = "primary",
+  className,
+  label,
+  onPress,
+  isDisabled,
+}: CustomButtonProps) {
   return (
     <View className="my-6">
       <Button
         className={button({ variant, className })}
         onPress={onPress}
         isDisabled={isDisabled}
-        feedbackVariant='scale'
+        feedbackVariant="scale"
       >
         {label && <Text className={labelText({ variant })}>{label}</Text>}
       </Button>

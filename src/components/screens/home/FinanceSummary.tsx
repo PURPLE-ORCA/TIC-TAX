@@ -21,52 +21,51 @@ export function FinanceSummary({
   onTaxHostageLongPress,
 }: FinanceSummaryProps) {
   return (
-
-      <View className="py-4 gap-4">
-        {/* Safe to Spend Card */}
-        <PlumCard className="p-6">
-          <View className="flex flex-row justify-between items-center">
-            <View>
-              <Text variant="smallBold" className="mb-1">
-                Safe to Spend
-              </Text>
-              <Text variant="subtitle">
-                {isLoading ? "..." : formatCurrencyNoSign(safeToSpend)}
-              </Text>
-            </View>
-              <LottieLoading size={100} />
+    <View className="py-4 gap-4">
+      {/* Safe to Spend Card */}
+      <PlumCard className="p-6">
+        <View className="flex flex-row justify-between items-center">
+          <View>
+            <Text variant="smallBold" className="mb-1">
+              Safe to Spend
+            </Text>
+            <Text variant="subtitle">
+              {isLoading ? "..." : formatCurrencyNoSign(safeToSpend)}
+            </Text>
           </View>
-        </PlumCard>
+          <LottieLoading size={100} />
+        </View>
+      </PlumCard>
 
-        <View className="flex flex-row gap-4">
-          <TouchableOpacity
-            className="flex-1"
-            onLongPress={onTaxHostageLongPress}
-            delayLongPress={300}
-          >
+      <View className="flex flex-row gap-4">
+        <TouchableOpacity
+          className="flex-1"
+          onLongPress={onTaxHostageLongPress}
+          delayLongPress={300}
+        >
+          <PlumCard className="">
+            <Text variant="small" className="mb-1">
+              Tax Hostage
+            </Text>
+            <Text variant="smallBold">
+              {isLoading ? "..." : formatCurrencyNoSign(taxHostage)}
+            </Text>
+          </PlumCard>
+        </TouchableOpacity>
+
+        <RenderIf condition={pendingCapital > 0}>
+          <View className="flex-1">
             <PlumCard className="">
               <Text variant="small" className="mb-1">
-                Tax Hostage
+                Awaiting Payment
               </Text>
               <Text variant="smallBold">
-                {isLoading ? "..." : formatCurrencyNoSign(taxHostage)}
+                {isLoading ? "..." : formatCurrencyNoSign(pendingCapital)}
               </Text>
             </PlumCard>
-          </TouchableOpacity>
-
-          <RenderIf condition={pendingCapital > 0}>
-            <View className="flex-1">
-              <PlumCard className="">
-                <Text variant="small" className="mb-1">
-                  Awaiting Payment
-                </Text>
-                <Text variant="smallBold">
-                  {isLoading ? "..." : formatCurrencyNoSign(pendingCapital)}
-                </Text>
-              </PlumCard>
-            </View>
-          </RenderIf>
-        </View>
+          </View>
+        </RenderIf>
       </View>
+    </View>
   );
 }

@@ -26,17 +26,13 @@ export function TimelineItem({
   return (
     <View className="flex-row">
       {/* Timeline column */}
-      <View
-        className="flex-col items-center mr-3 self-stretch"
-      >
+      <View className="flex-col items-center mr-3 self-stretch">
         {/* Top connector line */}
         {!isFirst && <View className="w-px flex-1 bg-white/10" />}
         {isFirst && <View className="flex-1" />}
 
         {/* Icon circle */}
-        <View
-          className="size-8 items-center justify-center shrink-0"
-        >
+        <View className="size-8 items-center justify-center shrink-0">
           <Icon name={icon} size={18} color={iconColor} />
         </View>
 
@@ -49,11 +45,7 @@ export function TimelineItem({
       <View className="flex-1 flex-row justify-between items-center py-2">
         <View className="flex-1">
           <Text variant="smallBold">{title}</Text>
-          {subtitle && (
-            <Text variant="small">
-              {subtitle}
-            </Text>
-          )}
+          {subtitle && <Text variant="small">{subtitle}</Text>}
         </View>
         {rightContent && <View className="ml-2">{rightContent}</View>}
       </View>

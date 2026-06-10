@@ -18,11 +18,14 @@ import { Calculator } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
-
 export default function RunwayScreen() {
   const router = useRouter();
   const { safeToSpend, isLoading: financeLoading } = useFinance();
-  const subscriptions = useQuery(api.subscriptions.getSubscriptions) ?? [];
+  const queriedSubscriptions = useQuery(api.subscriptions.getSubscriptions);
+  const subscriptions = useMemo(
+    () => queriedSubscriptions ?? [],
+    [queriedSubscriptions],
+  );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<
     (typeof subscriptions)[number]["_id"] | null
@@ -77,9 +80,7 @@ export default function RunwayScreen() {
       onLongPress={() => openDeleteDialog(item._id)}
       delayLongPress={300}
     >
-      <View
-        className="size-8 items-center justify-center shrink-0"
-      >
+      <View className="size-8 items-center justify-center shrink-0">
         <Icon name="arrow-up-outline" size={18} color="red" />
       </View>
       <View className="flex-1 mr-8">

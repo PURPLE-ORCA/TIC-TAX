@@ -457,6 +457,61 @@ Stabilized offline architecture after production regression: restored legacy tax
 
 ---
 
+# MISSION_DEBRIEF: OFFLINE-FIRST FEATURE
+
+## Status: COMPLETE
+
+Implemented offline-first transaction flow for TIC-TAX with SQLite source-of-truth, bidirectional Convex sync, and note/category repair across local and cloud records.
+
+### 1. Core Outcome
+
+- Transaction creation now works offline without blocking UI.
+- Local ledger persists first, then syncs to Convex when connectivity returns.
+- Existing cloud rows are pulled down and repaired into local SQLite.
+- Recent activity shows real `note` text instead of generic category fallbacks when available.
+
+### 2. Data Layer
+
+- Added SQLite-backed `transactions` ledger in `src/lib/ledger/sqlite.ts`.
+- Local row model in `src/lib/ledger/types.ts` stores integer cents plus sync metadata.
+- Repository layer in `src/lib/ledger/repository.ts` handles insert, upsert, status updates, and presentation repair.
+
+### 3. Sync Flow
+
+- `src/lib/ledger/sync-manager.ts` handles:
+  - foreground flush
+  - network restore flush
+  - cloud pull bootstrap
+  - metadata repair for stale local rows
+- Pull path repairs `category` and `note` from Convex when local values are missing or generic.
+- Sync cursor is stored in SecureStore.
+
+### 4. UI Flow
+
+- `src/store/useLedgerStore.ts` now updates Zustand immediately on create.
+- `src/components/finance/TransactionSheet.tsx` submits without waiting on disk sync.
+- `src/components/hooks/useFinance.ts` reads local ledger state and derives safe spend / tax hostage / recent activity.
+
+### 5. Convex Compatibility
+
+- `convex/schema.ts` supports current transaction shape plus legacy tax fields.
+- `convex/transactions.ts` keeps idempotent writes by `clientUuid`.
+- `convex/migrations.ts` provides migration and metadata backfill helpers.
+
+### 6. Verification
+
+- `bun run typecheck` passes.
+- Offline submit now updates UI immediately and syncs later.
+- Cloud data remains compatible with legacy rows and restored note text.
+
+---
+
+*MISSION COMPLETE: TIC-TAX now behaves like an offline-first ledger instead of a fragile network hostage.*
+
+*SUB-MISSION COMPLETE: Notes survive the round-trip, local writes stay instant, and cloud sync repairs stale presentation data.*
+
+---
+
 # MISSION_DEBRIEF: OFFLINE MODE WRITE-PATH STABILIZATION
 
 ## Status: COMPLETE

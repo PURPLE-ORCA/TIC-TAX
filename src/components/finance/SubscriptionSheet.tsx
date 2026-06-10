@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import { 
-  BottomSheet,
-  Button, 
-  Label, 
-  TextField,
-} from 'heroui-native';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import { Text } from '@/src/components/ui/text';
+import React, { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { BottomSheet, Button, Label, TextField } from "heroui-native";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Text } from "@/src/components/ui/text";
 
 interface SubscriptionSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetProps) {
-  const [name, setName] = useState('');
-  const [monthlyCost, setMonthlyCost] = useState('');
+export function SubscriptionSheet({
+  isOpen,
+  onOpenChange,
+}: SubscriptionSheetProps) {
+  const [name, setName] = useState("");
+  const [monthlyCost, setMonthlyCost] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const addSubscription = useMutation(api.subscriptions.addSubscription);
 
@@ -32,11 +30,11 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
         name,
         monthlyCost: cost,
       });
-      setName('');
-      setMonthlyCost('');
+      setName("");
+      setMonthlyCost("");
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to add subscription:', error);
+      console.error("Failed to add subscription:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -48,7 +46,7 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
         <BottomSheet.Overlay className="bg-black/60" />
         <BottomSheet.Content
           index={0}
-          snapPoints={['62%']}
+          snapPoints={["62%"]}
           enableDynamicSizing={false}
           enablePanDownToClose
           backgroundClassName="bg-background"
@@ -86,13 +84,13 @@ export function SubscriptionSheet({ isOpen, onOpenChange }: SubscriptionSheetPro
             </TextField>
 
             {/* Submit Button */}
-            <Button 
+            <Button
               variant="primary"
               onPress={handleSubmit}
               isDisabled={!name || !monthlyCost || isSubmitting}
             >
               {isSubmitting ? (
-                <Button.Label >Adding...</Button.Label>
+                <Button.Label>Adding...</Button.Label>
               ) : (
                 <>
                   <Button.Label>Add Subscription</Button.Label>
@@ -110,9 +108,9 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 48,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    color: '#f8fafc',
+    borderColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "rgba(255,255,255,0.04)",
+    color: "#f8fafc",
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,

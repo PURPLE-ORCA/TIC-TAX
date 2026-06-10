@@ -1,17 +1,17 @@
-import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
+import { create } from "zustand";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   insertTransaction,
   selectAllTransactions,
   updateTransactionStatus as updateTransactionStatusInDb,
-} from '@/src/lib/ledger/repository';
-import type { LedgerTransactionRow } from '@/src/lib/ledger/types';
+} from "@/src/lib/ledger/repository";
+import type { LedgerTransactionRow } from "@/src/lib/ledger/types";
 
 type AddLedgerTransactionInput = {
-  type: LedgerTransactionRow['type'];
+  type: LedgerTransactionRow["type"];
   amount: number;
-  status: LedgerTransactionRow['status'];
+  status: LedgerTransactionRow["status"];
   category?: string;
   note?: string;
   taxRate?: number;
@@ -36,7 +36,7 @@ export function registerLedgerSyncTrigger(callback: () => void): void {
 
 function requestSync(): void {
   if (__DEV__) {
-    console.log('[ledger-store] requestSync');
+    console.log("[ledger-store] requestSync");
   }
   triggerSync?.();
 }
@@ -90,7 +90,7 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
     const row = buildLedgerTransaction(input, now);
 
     if (__DEV__) {
-      console.log('[ledger-store] addTransaction:start', {
+      console.log("[ledger-store] addTransaction:start", {
         id: row.id,
         type: row.type,
         amount: row.amount,
@@ -105,14 +105,14 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
     }));
 
     if (__DEV__) {
-      console.log('[ledger-store] addTransaction:stateUpdated', { id: row.id });
+      console.log("[ledger-store] addTransaction:stateUpdated", { id: row.id });
     }
 
     try {
       await insertTransaction(row);
     } catch (error) {
       if (__DEV__) {
-        console.error('[ledger-store] addTransaction:persistError', error);
+        console.error("[ledger-store] addTransaction:persistError", error);
       }
 
       set((state) => ({
@@ -122,7 +122,7 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
     }
 
     if (__DEV__) {
-      console.log('[ledger-store] addTransaction:inserted', { id: row.id });
+      console.log("[ledger-store] addTransaction:inserted", { id: row.id });
     }
 
     requestSync();
@@ -130,14 +130,14 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
 
   cancelTransaction: async (id) => {
     const now = Date.now();
-    await updateTransactionStatusInDb(id, 'CANCELLED', now);
+    await updateTransactionStatusInDb(id, "CANCELLED", now);
 
     set((state) => ({
       transactions: state.transactions.map((row) =>
         row.id === id
           ? {
               ...row,
-              status: 'CANCELLED',
+              status: "CANCELLED",
               updated_at: now,
               is_synced: 0,
               sync_attempts: 0,
@@ -152,14 +152,14 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
 
   clearIncome: async (id) => {
     const now = Date.now();
-    await updateTransactionStatusInDb(id, 'CLEARED', now);
+    await updateTransactionStatusInDb(id, "CLEARED", now);
 
     set((state) => ({
       transactions: state.transactions.map((row) =>
         row.id === id
           ? {
               ...row,
-              status: 'CLEARED',
+              status: "CLEARED",
               updated_at: now,
               is_synced: 0,
               sync_attempts: 0,
@@ -173,9 +173,11 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
   },
 
   markTaxesPaid: async () => {
-    const activeRows = get().transactions.filter((row) => row.status !== 'CANCELLED');
+    const activeRows = get().transactions.filter(
+      (row) => row.status !== "CANCELLED",
+    );
     const taxHostage = activeRows.reduce((sum, row) => {
-      if (row.type !== 'INCOME' || row.status !== 'CLEARED') {
+      if (row.type !== "INCOME" || row.status !== "CLEARED") {
         return sum;
       }
 
@@ -189,10 +191,10 @@ export const useLedgerStore = create<LedgerStore>((set, get) => ({
     const now = Date.now();
     const paymentRow = buildLedgerTransaction(
       {
-        type: 'TAX_PAYMENT',
+        type: "TAX_PAYMENT",
         amount: taxHostage,
-        status: 'CLEARED',
-        category: 'Tax Payment',
+        status: "CLEARED",
+        category: "Tax Payment",
         note: undefined,
         taxRate: 100,
       },

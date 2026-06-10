@@ -38,7 +38,7 @@ export function TransactionSheet({
   const handleSubmit = async () => {
     const amountCents = toCents(amount);
     if (__DEV__) {
-      console.log('[tx-sheet] submit:start', {
+      console.log("[tx-sheet] submit:start", {
         rawAmount: amount,
         parsedCents: amountCents,
         type,
@@ -61,7 +61,7 @@ export function TransactionSheet({
         taxRate: 100,
       });
       if (__DEV__) {
-        console.log('[tx-sheet] submit:success');
+        console.log("[tx-sheet] submit:success");
       }
       setAmount("");
       setNote("");
@@ -69,7 +69,7 @@ export function TransactionSheet({
       onOpenChange(false);
     } catch (error) {
       if (__DEV__) {
-        console.error('[tx-sheet] submit:error', error);
+        console.error("[tx-sheet] submit:error", error);
       }
       console.error("Failed to log transaction:", error);
     } finally {
@@ -90,9 +90,7 @@ export function TransactionSheet({
         >
           <View className="gap-8 pb-safe">
             <View className="items-center">
-              <Text variant="large">
-                New Transaction
-              </Text>
+              <Text variant="large">New Transaction</Text>
             </View>
 
             {/* IN/OUT Toggle */}

@@ -1,11 +1,11 @@
-import type React from 'react';
-import type { View, ViewProps } from 'react-native';
+import type React from "react";
+import type { View, ViewProps } from "react-native";
 import type {
   SharedValue,
   DerivedValue,
   WithTimingConfig,
   WithSpringConfig,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 /** Shimmer context shared between root and child components. */
 export interface ShimmerContextValue {
@@ -37,8 +37,11 @@ interface ShimmerAnimationConfigBase {
 }
 
 export type ShimmerAnimationConfig =
-  | (ShimmerAnimationConfigBase & { type: 'timing'; config?: WithTimingConfig })
-  | (ShimmerAnimationConfigBase & { type: 'spring'; config?: WithSpringConfig });
+  | (ShimmerAnimationConfigBase & { type: "timing"; config?: WithTimingConfig })
+  | (ShimmerAnimationConfigBase & {
+      type: "spring";
+      config?: WithSpringConfig;
+    });
 
 /**
  * Overlay width value.
@@ -104,9 +107,12 @@ export interface ShimmerMaskProps {
  */
 export interface UseShimmerAnimationConfig
   extends
-    Pick<ShimmerContextValue, 'containerWidth' | 'containerHeight'>,
-    Required<Pick<ShimmerOverlayProps, 'trackAngle' | 'overlayAngle'>>,
-    Pick<ShimmerOverlayProps, 'duration' | 'initialDelay' | 'repeatDelay' | 'animation'> {
+    Pick<ShimmerContextValue, "containerWidth" | "containerHeight">,
+    Required<Pick<ShimmerOverlayProps, "trackAngle" | "overlayAngle">>,
+    Pick<
+      ShimmerOverlayProps,
+      "duration" | "initialDelay" | "repeatDelay" | "animation"
+    > {
   /** Resolved overlay width (pixels). Derived from the width prop. */
   overlayWidth: DerivedValue<number>;
   /** Total distance the overlay must travel along the track. */

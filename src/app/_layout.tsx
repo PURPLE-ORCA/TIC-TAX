@@ -1,7 +1,7 @@
 import "@/src/polyfills";
 import "@/src/global.css";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import * as NavigationBar from "expo-navigation-bar";
+import { NavigationBar } from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { HeroUINativeProvider } from "heroui-native";
@@ -43,7 +43,7 @@ export default function RootLayout() {
 
     if (Platform.OS === "android") {
       NavigationBar.setStyle("dark");
-      void NavigationBar.setVisibilityAsync("visible");
+      NavigationBar.setHidden(false);
     }
   }, []);
 

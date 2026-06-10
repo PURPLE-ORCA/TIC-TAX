@@ -1,12 +1,12 @@
-import { type ReactNode } from 'react';
-import { Pressable, useWindowDimensions, type ViewStyle } from 'react-native';
+import { type ReactNode } from "react";
+import { Pressable, useWindowDimensions, type ViewStyle } from "react-native";
 import Animated, {
   interpolate,
   type SharedValue,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 type CarouselConfig = {
   horizontalPadding?: number;
@@ -48,7 +48,10 @@ function Carousel<T>({
   const { width: screenWidth } = useWindowDimensions();
   const scrollX = useSharedValue(0);
 
-  const { horizontalPadding, visibleItems, peekRatio, gap } = { ...DEFAULTS, ...config };
+  const { horizontalPadding, visibleItems, peekRatio, gap } = {
+    ...DEFAULTS,
+    ...config,
+  };
 
   const availableWidth = screenWidth - horizontalPadding * 2;
   const itemWidth = availableWidth / (visibleItems + peekRatio * 2);
@@ -64,12 +67,15 @@ function Carousel<T>({
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerClassName="items-start pb-2"
-      contentContainerStyle={[{ paddingHorizontal: horizontalPadding, gap }, contentContainerStyle]}
+      contentContainerStyle={[
+        { paddingHorizontal: horizontalPadding, gap },
+        contentContainerStyle,
+      ]}
       onScroll={scrollHandler}
       scrollEventThrottle={16}
       {...(snap && {
         snapToInterval: itemWidth + gap,
-        decelerationRate: 'fast',
+        decelerationRate: "fast",
         disableIntervalMomentum: true,
       })}
     >
@@ -123,7 +129,7 @@ function CarouselItem<T>({
       scrollX.get(),
       [offset - itemWidth, offset, offset + itemWidth],
       [inactiveScale, activeScale, inactiveScale],
-      'clamp',
+      "clamp",
     );
 
     return { transform: [{ scale }] };

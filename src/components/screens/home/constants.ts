@@ -1,6 +1,12 @@
 import type { IconName } from "@/src/components/ui/icon";
 
-export const CATEGORIES = ["Taxi", "Food", "SaaS", "Equipement", "Junk"] as const;
+export const CATEGORIES = [
+  "Taxi",
+  "Food",
+  "SaaS",
+  "Equipement",
+  "Junk",
+] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 

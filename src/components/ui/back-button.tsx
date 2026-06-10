@@ -26,7 +26,7 @@ export function BackButton({
         onPress={onPress}
         className={className}
       >
-        <Icon name={BACK_ICON_NAME} size={20} color="white"/>
+        <Icon name={BACK_ICON_NAME} size={20} color="white" />
       </Button>
     </View>
   );

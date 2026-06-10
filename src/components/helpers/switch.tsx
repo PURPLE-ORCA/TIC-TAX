@@ -1,4 +1,4 @@
-import { Activity, type ComponentType, type ReactNode } from 'react';
+import { Activity, type ComponentType, type ReactNode } from "react";
 
 type CaseComponent = ReactNode | ComponentType;
 
@@ -12,7 +12,7 @@ export interface SwitchProps {
 }
 
 function renderCase(component: CaseComponent) {
-  if (typeof component === 'function') {
+  if (typeof component === "function") {
     const Component = component;
     return <Component />;
   }
@@ -30,11 +30,11 @@ export function Switch({ components, defaultComponent, value }: SwitchProps) {
   return (
     <>
       {allKeys.map((key) => (
-        <Activity key={key} mode={key === activeKey ? 'visible' : 'hidden'}>
+        <Activity key={key} mode={key === activeKey ? "visible" : "hidden"}>
           {renderCase(components[key])}
         </Activity>
       ))}
-      <Activity mode={activeKey === undefined ? 'visible' : 'hidden'}>
+      <Activity mode={activeKey === undefined ? "visible" : "hidden"}>
         {renderCase(defaultComponent)}
       </Activity>
     </>

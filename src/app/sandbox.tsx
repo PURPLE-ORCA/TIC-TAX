@@ -116,7 +116,7 @@ export default function SandboxScreen() {
     <SafeScreen safeArea="both">
       {/* Header */}
       <BackButton onPress={() => router.back()} />
-        
+
       {/* Impact Section: The Opportunity Cost */}
       <OpportunityCost
         runwayLostDays={runwayLostDays}

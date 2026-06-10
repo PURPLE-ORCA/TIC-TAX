@@ -1,7 +1,7 @@
-import { CustomButton } from '@/src/components/ui/custom-button';
-import { Input, Label, TextField } from 'heroui-native';
-import React from 'react';
-import { View } from 'react-native';
+import { CustomButton } from "@/src/components/ui/custom-button";
+import { Input, Label, TextField } from "heroui-native";
+import React from "react";
+import { View } from "react-native";
 
 export interface SandboxInputProps {
   itemName: string;

@@ -28,11 +28,22 @@ export function PayTaxesDialog({
             </Dialog.Description>
           </View>
           <View className="flex-row justify-end gap-3">
-            <Button variant="tertiary" size="sm" onPress={() => onOpenChange(false)}>
+            <Button
+              variant="tertiary"
+              size="sm"
+              onPress={() => onOpenChange(false)}
+            >
               <Button.Label>Cancel</Button.Label>
             </Button>
-            <Button variant="primary" size="sm" onPress={onConfirm} isDisabled={isLoading}>
-              <Button.Label>{isLoading ? "Confirming..." : "Confirm"}</Button.Label>
+            <Button
+              variant="primary"
+              size="sm"
+              onPress={onConfirm}
+              isDisabled={isLoading}
+            >
+              <Button.Label>
+                {isLoading ? "Confirming..." : "Confirm"}
+              </Button.Label>
             </Button>
           </View>
         </Dialog.Content>

@@ -1,7 +1,7 @@
-import { useThemeColor } from 'heroui-native';
-import { ReactNode } from 'react';
-import { View } from 'react-native';
-import { Easing } from 'react-native-reanimated';
+import { useThemeColor } from "heroui-native";
+import { ReactNode } from "react";
+import { View } from "react-native";
+import { Easing } from "react-native-reanimated";
 import Shimmer from "@/src/components/animations/animation/shimmer";
 import { Text } from "@/src/components/ui/text";
 
@@ -11,7 +11,7 @@ interface TextShimmerProps {
 }
 
 export default function TextShimmer({ children, className }: TextShimmerProps) {
-  const foregroundColor = useThemeColor('foreground') as string;
+  const foregroundColor = useThemeColor("foreground") as string;
 
   return (
     <Shimmer>
@@ -21,7 +21,7 @@ export default function TextShimmer({ children, className }: TextShimmerProps) {
           <Shimmer.Overlay
             width="100%"
             animation={{
-              type: 'timing',
+              type: "timing",
               config: { duration: 2000, easing: Easing.in(Easing.ease) },
             }}
           >
@@ -34,9 +34,7 @@ export default function TextShimmer({ children, className }: TextShimmerProps) {
           </Shimmer.Overlay>
         }
       >
-        <Text className={className}>
-          {children}
-        </Text>
+        <Text className={className}>{children}</Text>
       </Shimmer.Mask>
     </Shimmer>
   );

@@ -1,5 +1,5 @@
-import React, { Children, type ReactNode } from 'react';
-import { If } from './if';
+import React, { Children, type ReactNode } from "react";
+import { If } from "./if";
 
 type Props = {
   children: ReactNode;
